@@ -25,3 +25,8 @@ Route::prefix('posts')->namespace('WebApi')->group(function() {
     Route::delete('/{post}','PostController@destroy');
 });
 
+Route::prefix('comments')->namespace('WebApi')->group(function (){
+    Route::post('/posts/{post}','CommentController@addToPost');
+    Route::post('/comments/{comment}','CommentController@addToComment');
+    Route::delete('/comments/{comment}','CommentController@destroy');
+});

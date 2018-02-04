@@ -4,7 +4,7 @@ namespace App\Http\Controllers\WebApi;
 
 use App\Http\Requests\StorePostRequest;
 use App\Http\Requests\UpdatePostRequest;
-use App\Http\ReturnHelpers;
+use App\Http\ReturnHelper;
 use App\Post;
 use App\Transformers\PostTransformer;
 use Cyvelnet\Laravel5Fractal\Facades\Fractal;
@@ -20,34 +20,24 @@ class PostController extends Controller
 {
     public function index()
     {
-        $cnt = \request('cnt') ? \request('cnt'): 15;
+        $cnt = \request('cnt') ? \request('cnt'): 3;
         $posts = Post::take($cnt)->get();
 
-        $data = (new Manager())
-            ->parseIncludes('user')
-            ->createData(new Collection($posts,new PostTransformer()))
-            ->toArray();
-
-        return ReturnHelpers::returnWithStatus($data['data']);
-//        return Fractal::includes('user')->collection($posts,new PostTransformer());
+        return ReturnHelper::returnWithStatus(
+            Fractal::includes('user')->collection($posts,new PostTransformer())
+        );
 
     }
 
-//    public function show(Post $post)
+//    public function show(Post $post)  //TODO ←这样处理不知道怎么返回
     public function show($id)
     {
         $post = Post::find($id);
         if($post === null){
-            return ReturnHelpers::returnWithStatus(null,Response::HTTP_NOT_FOUND,'Not Found');
+            return ReturnHelper::returnWithStatus(null,Response::HTTP_NOT_FOUND,'Not Found');
         }
 
-        $data = (new Manager())
-            ->parseIncludes('user')
-            ->createData(new Item($post,new PostTransformer()))
-            ->toArray();
-
-        return ReturnHelpers::returnWithStatus($data['data']);
-//        return Fractal::includes('user')->item($post,new PostTransformer());
+        return ReturnHelper::returnWithStatus(Fractal::includes('user')->item($post,new PostTransformer()));
     }
 
     public function store(StorePostRequest $request)
@@ -57,7 +47,7 @@ class PostController extends Controller
         $post = new Post();
         $post->title = $request->title;
         $post->description = $request->description;
-//        $post->user_id = $request->user()->id;
+//        $post->user_id = $request->user()->id;  //TODO
         $post->user_id = $request->user_id;
         $post->body = $request->body;
         $post->anonymous = $request->anonymous;
@@ -69,33 +59,27 @@ class PostController extends Controller
             ->createData(new Item($post,new PostTransformer()))
             ->toArray();
 
-        return ReturnHelpers::returnWithStatus($data['data']);
-//        return Fractal::includes('user')->item($post, new PostTransformer());
+        return ReturnHelper::returnWithStatus(Fractal::includes('user')->item($post, new PostTransformer()));
     }
 
     public function update(Request $request, $id)
     {
         $post = Post::find($id);
         if($post === null){
-            return ReturnHelpers::returnWithStatus(null,Response::HTTP_NOT_FOUND,'Not Found');
+            return ReturnHelper::returnWithStatus(null,Response::HTTP_NOT_FOUND,'Not Found');
         }
 
         //TODO 需要判断是否认证通过
 
        if($request->isMethod('patch')){
-           $post->title = $request->get('title',$post->title);
-           $post->description = $request->get('description',$post->description);
-           $post->body = $request->get('body',$post->body);
-           $post->anonymous = $request->get('anonymous',$post->anonymous);
+           $post->title = $request->input('title',$post->title);
+           $post->description = $request->input('description',$post->description);
+           $post->body = $request->input('body',$post->body);
+           $post->anonymous = $request->input('anonymous',$post->anonymous);
        }
        $post->save();
 
-        $data = (new Manager())
-            ->parseIncludes('user')
-            ->createData(new Item($post,new PostTransformer()))
-            ->toArray();
-        return ReturnHelpers::returnWithStatus($data['data']);
-//       return Fractal::includes('user')->item($post, new PostTransformer());
+       return ReturnHelper::returnWithStatus(Fractal::includes('user')->item($post, new PostTransformer()));
     }
 
 //    public function destroy(Post $post)
@@ -105,16 +89,16 @@ class PostController extends Controller
 
         $post = Post::find($id);
         if($post === null){
-            return ReturnHelpers::returnWithStatus(null,Response::HTTP_NOT_FOUND,'Not Found');
+            return ReturnHelper::returnWithStatus(null,Response::HTTP_NOT_FOUND,'Post Not Found');
         }
         try{
             $post->delete();
         }catch (\Exception $e){
-            return ReturnHelpers::returnWithStatus(null,Response::HTTP_PRECONDITION_FAILED,'Deleted Failed');
+            return ReturnHelper::returnWithStatus(null,Response::HTTP_PRECONDITION_FAILED,'Deleted Failed');
 //            return $e->getMessage();
         }
 
-        return ReturnHelpers::returnWithStatus();
+        return ReturnHelper::returnWithStatus('true');
 
     }
 }

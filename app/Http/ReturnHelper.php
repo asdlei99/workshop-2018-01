@@ -8,8 +8,11 @@
 
 namespace App\Http;
 
-
-class ReturnHelpers
+/**
+ * Class ReturnHelper
+ * @package App\Http
+ */
+class ReturnHelper
 {
     protected $code;
 
@@ -50,8 +53,30 @@ class ReturnHelpers
         ];
     }
 
+    /**
+     * @param null $data
+     * @param int $code
+     * @param string $status
+     * @return array
+     */
     public static function returnWithStatus($data = null, $code = 200, $status = 'OK')
     {
+        if(is_object($data)){
+            return [
+                'data' => json_decode($data->toJSON(),true)['data'],
+                'code' => $code,
+                'status' => $status,
+            ];
+        }
+
+        if(is_array($data) && key_exists('errors',$data)){
+            return [
+                'errors' => $data['errors'],
+                'code' => $code,
+                'status' => $status,
+            ];
+        }
+
         return [
             'data' => $data,
             'code' => $code,
