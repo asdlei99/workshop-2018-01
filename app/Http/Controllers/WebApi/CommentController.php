@@ -62,13 +62,12 @@ class CommentController extends Controller
 
     public function destroy($id)
     {
+        //TODO 身份认证
         $parent_comment = Comment::find($id);
         if(null === $parent_comment){
             return ReturnHelper::returnWithStatus(null,Response::HTTP_NOT_FOUND,'Comment Not Found');
         }
-//        var_dump($parent_comment->getChildren());
-        return ReturnHelper::returnWithStatus($parent_comment->getChildren());
-
-        
+        $parent_comment->deleteSelfAndChildren();
+        return ReturnHelper::returnWithStatus() ;
     }
 }

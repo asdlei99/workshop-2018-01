@@ -15,18 +15,51 @@ class Comment extends Model
         return $this->belongsTo(Post::class,'post_id','id')->getResults();
     }
 
-    public function getChildren()
+    public function children()
+    {
+        $this->hasMany(Comment::class,'parent_id','id')->getResults();
+    }
+
+    public function getChildrenAndGrandChildren()
     {
         $children = $this->hasMany(Comment::class,'parent_id','id')->getResults();
-        $i =0;
+
+        $data = []; $i = 0;
         foreach ($children as $child){
-            $data[] = $child;
-            $data[$i][] = $child->hasMany(Comment::class,'parent_id','id')->getResults();
-            $i++;
-//            $grand_children = $child->hasMany(Comment::class,'parent_id','id')->getResults();
+            $data[$i++]['child'] = $child;
+            $grand_children = $child->hasMany(Comment::class,'parent_id','id')->getResults();
+            $data[$i++]['grand_children'] = $grand_children;
+
         }
-//        return [$children,$grand_children];
         return $data;
+    }
+
+    public function deleteSelfAndChildren()
+    {
+        if($this->level == 1){
+            $children = $this->hasMany(Comment::class,'parent_id','id')->getResults();
+            foreach ($children as $child){
+                $grand_children = $child->hasMany(Comment::class,'parent_id','id')->getResults();
+                foreach ($grand_children as $grand_child){
+                    $grand_child->body = '由于父评论删除，该评论隐藏';
+                    $grand_child->save();
+                }
+            }
+            foreach ($children as $child) {
+                $child->body = '由于父评论删除，该评论隐藏';
+                $child->save();
+            }
+        }elseif($this->level == 2){
+            $children = $this->hasMany(Comment::class,'parent_id','id')->getResults();
+            foreach ($children as $child) {
+                $child->body = '由于父评论删除，该评论隐藏';
+                $child->save();
+            }
+        }
+        $this->body = '该评论已删除';
+        $this->save();
+
+
     }
 
 }

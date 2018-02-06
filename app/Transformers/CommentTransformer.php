@@ -16,7 +16,7 @@ class CommentTransformer extends TransformerAbstract
      *
      * @var array
      */
-    protected $availableIncludes = [];
+    protected $availableIncludes = ['post','user','comment'];
 
     /**
      * List of resources to automatically include
@@ -31,18 +31,25 @@ class CommentTransformer extends TransformerAbstract
      * @var $resource
      * @return array
      */
-    public function transform($resource)
+    public function transform(Comment $comment)
     {
         return [
-
-            'id' => $resource->id,
-			
+            'id' => $comment->id,
+            'post_id' => $comment->post_id,
+            'user_id' => $comment->user_id,
+            'parent_id' => $comment->parent_id,
+            'level' => $comment->level,
+            'body' => $comment->body,
+            'created_at' => $comment->created_at,
         ];
     }
 
-    public function includeComment(Comment $comment)
+    public function includeChildren(Comment $comment)
     {
-        if($comment->level)
-        
+        if($comment->level > 1){
+            return null;
+        }else{
+            return $this->collection($comment->children(),new CommentTransformer());
+        }
     }
 }
