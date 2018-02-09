@@ -6,11 +6,11 @@
     "type": "project",
     "require": {
         "php": ">=7.0.0",
+        "cantjie/oauth2-laravel-eeyes": "dev-master",
         "cyvelnet/laravel5-fractal": "^2.2",
         "fideloper/proxy": "~3.3",
         "ganlvtech/eeyes-common": "^0.1.1",
         "laravel/framework": "5.5.*",
-        "laravel/passport": "^4.0",
         "laravel/tinker": "~1.0"
     },
     "require-dev": {

@@ -168,7 +168,6 @@ return [
          * Package Service Providers...
          */
 
-        \Laravel\Passport\PassportServiceProvider::class,
         \Cyvelnet\Laravel5Fractal\Laravel5FractalServiceProvider::class,
 
         /*

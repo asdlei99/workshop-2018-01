@@ -8,7 +8,7 @@ use Laravel\Passport\HasApiTokens;
 
 class User extends Authenticatable
 {
-    use Notifiable,HasApiTokens;
+    use Notifiable;
 
     /**
      * The attributes that are mass assignable.
@@ -32,4 +32,11 @@ class User extends Authenticatable
     {
         return $this->hasMany(Post::class,'user_id','id')->getResults();
     }
+
+
+    public static function getUserByUsername($username)
+    {
+        return Post::where('username','=',$username)->first();
+    }
+
 }

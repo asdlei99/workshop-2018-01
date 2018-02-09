@@ -11,6 +11,10 @@
 |
 */
 
-Route::get('/', function () {
-    return view('welcome');
+
+Route::namespace('Web')->group(function (){
+   Route::get('/','IndexController@index');
+   Route::get('login','IndexController@login')->name('login');
+   Route::get('/logout','IndexController@logout');
+   Route::post('/logout','IndexController@logout')->name('logout');
 });

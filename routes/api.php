@@ -30,3 +30,11 @@ Route::prefix('comments')->namespace('WebApi')->group(function (){
     Route::post('/comments/{comment}','CommentController@addToComment');
     Route::delete('/comments/{comment}','CommentController@destroy');
 });
+
+Route::prefix('users')->namespace('WebApi')->group(function(){
+   Route::post('/','UserController@create');
+   Route::get('/','UserController@create');
+});
+
+Route::get('/','Web\\IndexController@index');
+
