@@ -32,9 +32,11 @@ Route::prefix('comments')->namespace('WebApi')->group(function (){
 });
 
 Route::prefix('users')->namespace('WebApi')->group(function(){
-   Route::post('/','UserController@create');
-   Route::get('/','UserController@create');
+   Route::post('/info','UserController@getSelfInfo');
 });
 
-Route::get('/','Web\\IndexController@index');
+//Route::middleware('session')->namespace('WebApi')->group(function(){
+//
+//});
+
 

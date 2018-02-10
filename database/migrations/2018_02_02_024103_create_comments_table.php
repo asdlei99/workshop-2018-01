@@ -21,6 +21,7 @@ class CreateCommentsTable extends Migration
             $table->tinyInteger('level')->default(0);
             $table->text('body');
             $table->timestamp('created_at', 0)->nullable();
+            $table->softDeletes();
         });
     }
 

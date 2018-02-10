@@ -22,6 +22,7 @@ class CreatePostsTable extends Migration
             $table->boolean("anonymous")->default(false);
             $table->integer("views")->default(0);
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

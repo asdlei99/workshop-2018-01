@@ -16,7 +16,7 @@ class User extends Authenticatable
      * @var array
      */
     protected $fillable = [
-        'name', 'email', 'password',
+        'username', 'email', 'password',
     ];
 
     /**
@@ -36,7 +36,7 @@ class User extends Authenticatable
 
     public static function getUserByUsername($username)
     {
-        return Post::where('username','=',$username)->first();
+        return User::where('username','=',$username)->first();
     }
 
 }
