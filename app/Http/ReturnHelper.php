@@ -63,7 +63,8 @@ class ReturnHelper
     {
         if(is_object($data)){
             return [
-                'data' => json_decode($data->toJSON(),true)['data'],
+//                'data' => json_decode($data->toJSON(),true)['data'],
+                'data' => json_decode($data->toJSON(),true),
                 'code' => $code,
                 'status' => $status,
             ];

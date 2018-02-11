@@ -56,7 +56,7 @@ class PostTransformer extends TransformerAbstract
         if($post->anonymous){   //判断是否匿名
             return null;
         }else{
-            return $this->item($post->user(),new UserTransformer());
+            return $this->item($post->user(),new UserSelfTransformer());
         }
 
     }

@@ -6,10 +6,9 @@ use League\Fractal;
 use League\Fractal\TransformerAbstract;
 use League\Fractal\Resource\Collection;
 use League\Fractal\Resource\Item;
-use App\User;
 
 
-class UserTransformer extends TransformerAbstract
+class UserOtherTransformer extends TransformerAbstract
 {
     /**
      * List of resources possible to include
@@ -33,13 +32,12 @@ class UserTransformer extends TransformerAbstract
      */
     public function transform(User $user)
     {
-        //TODO 是否登录影响输出结果
         $data = [
             'id' => $user->id,
             'username' => $user->username,
             'nickname' => $user->nickname,
             'head_img' => $user->head_img,
-            'user_group' => $user->user_group,
+//            'user_group' => $user->user_group,
         ];
         if($user->email_access){
             $data['email'] = $user->email;
@@ -61,5 +59,4 @@ class UserTransformer extends TransformerAbstract
     {
         return $this->collection($user->posts(),new PostTransformer());
     }
-
 }
