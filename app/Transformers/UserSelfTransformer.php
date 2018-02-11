@@ -37,6 +37,7 @@ class UserSelfTransformer extends TransformerAbstract
             'id' => $user->id,
             'username' => $user->username,
             'nickname' => $user->nickname,
+            'signature' => $user->signature,
             'head_img' => $user->head_img,
 //            'user_group' => $user->user_group,
             'email' => $user->email,

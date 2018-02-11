@@ -30,13 +30,14 @@ class UserOtherTransformer extends TransformerAbstract
      * @var $resource
      * @return array
      */
-    public function transform(User $user)
+    public function transform(\App\User $user)
     {
         $data = [
             'id' => $user->id,
             'username' => $user->username,
             'nickname' => $user->nickname,
             'head_img' => $user->head_img,
+            'signature' => $user->signature,
 //            'user_group' => $user->user_group,
         ];
         if($user->email_access){

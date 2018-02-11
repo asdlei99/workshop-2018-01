@@ -29,7 +29,7 @@ class PostController extends Controller
 
     }
 
-//    public function show(Post $post)  //TODO ←这样处理不知道怎么返回
+
     public function show($id)
     {
         $post = Post::find($id);
@@ -42,23 +42,24 @@ class PostController extends Controller
 
     public function store(StorePostRequest $request)
     {
-        //TODO 判断是否登录
-
         $post = new Post();
-        $post->title = $request->title;
-        $post->description = $request->description;
-//        $post->user_id = $request->user()->id;  //TODO
-        $post->user_id = $request->user_id;
-        $post->body = $request->body;
-        $post->anonymous = $request->anonymous;
+        $post->title = $request->input('title');
+        $post->body = $request->input('body');
+        if($request->input('description')){
+            $post->description = $request->input('description');
+        }else{
+            $post->description = $post->title;
+        }
 
-        $post->save();
-
-        $data = (new Manager())
-            ->parseIncludes('user')
-            ->createData(new Item($post,new PostTransformer()))
-            ->toArray();
-
+        $post->user_id = session('user')->id;
+        $post->anonymous = $request->input('anonymous');
+        try{
+            $post->save();
+        }catch (\Exception $e){
+            return ReturnHelper::returnWithStatus(['errors'=>'文章储存失败，请稍后重试'],2002,'文章储存失败');
+//            return ReturnHelper::returnWithStatus(['errors'=>$e->getMessage()],2002,'文章储存失败');
+        }
+        //TODO archive 存入 post_archive表
         return ReturnHelper::returnWithStatus(Fractal::includes('user')->item($post, new PostTransformer()));
     }
 
@@ -82,7 +83,6 @@ class PostController extends Controller
        return ReturnHelper::returnWithStatus(Fractal::includes('user')->item($post, new PostTransformer()));
     }
 
-//    public function destroy(Post $post)
     public function destroy($id)
     {
         //TODO 判断是否认证通过

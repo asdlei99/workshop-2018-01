@@ -24,7 +24,7 @@ class CheckAuth
 
         if(! $oauth2token){
             $response = response()->json(
-                ReturnHelper::returnWithStatus(['errors'=>'token_id错误'],1002,'Unauthorized')
+                ReturnHelper::returnWithStatus(['errors'=>'token_id错误'],1002,'token_id不存在')
             );
             return $response;
         }
@@ -34,7 +34,7 @@ class CheckAuth
 
         if($oauth2token->access_token !== $access_token){
             $response = response()->json(
-                ReturnHelper::returnWithStatus(['errors'=>'token_id与token不符，请尝试重新登录'],1003,'Unauthorized')
+                ReturnHelper::returnWithStatus(['errors'=>'token_id与token不符，请尝试重新登录'],1003,'token_id与access_token不符')
             );
             return $response;
         }
@@ -44,7 +44,7 @@ class CheckAuth
 
         if(null === $user){
             $response = response()->json(
-                ReturnHelper::returnWithStatus(['errors'=>'第一次登陆，请完善信息'],1001,'Unauthorized')
+                ReturnHelper::returnWithStatus(['errors'=>'第一次登陆，请完善信息'],1001,'首次登陆，尚未存储用户')
             );
             return $response;
         }

@@ -18,11 +18,11 @@ use Illuminate\Http\Request;
 //});
 
 Route::prefix('posts')->namespace('WebApi')->group(function() {
-    Route::get('/home','PostController@index');
-    Route::post('/','PostController@store');
-    Route::get('/{post}','PostController@show');
-    Route::patch('/{post}','PostController@update');
-    Route::delete('/{post}','PostController@destroy');
+//    Route::get('/home','PostController@index');
+    Route::post('/','PostController@store')->middleware('auth');
+//    Route::get('/{post}','PostController@show');
+//    Route::patch('/{post}','PostController@update');
+//    Route::delete('/{post}','PostController@destroy');
 });
 
 Route::prefix('comments')->namespace('WebApi')->group(function (){
@@ -32,8 +32,11 @@ Route::prefix('comments')->namespace('WebApi')->group(function (){
 });
 
 Route::prefix('users')->namespace('WebApi')->group(function(){
-   Route::post('/info','UserController@getSelfInfo')->middleware('auth');
-   Route::post('/','UserController@create');
+    Route::post('/','UserController@create');
+    Route::patch('/','UserController@update')->middleware('auth');
+    Route::delete('/','UserController@destroy')->middleware('auth');
+    Route::post('/info','UserController@getSelfInfo')->middleware('auth');
+    Route::get('/{username}/info','UserController@getInfo');
 });
 
 

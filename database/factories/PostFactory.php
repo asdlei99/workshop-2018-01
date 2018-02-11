@@ -7,7 +7,7 @@ $factory->define(App\Post::class, function (Faker $faker) {
         'title' => $faker->sentence(),
         'description' => $faker->sentence(),
         'body' => $faker->paragraph(),
-        'user_id' => 2,
-        'view' => random_int(0,999),
+        'user_id' => 1,
+        'views' => random_int(0,999),
     ];
 });

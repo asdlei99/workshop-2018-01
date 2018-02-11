@@ -20,6 +20,7 @@ class CreateUsersTable extends Migration
             $table->string('nickname');
             $table->string('password')->nullable();
             $table->string("head_img")->nullable();
+            $table->string("signature")->nullable();
             $table->tinyInteger("user_group")->default("3");
             $table->string("phone")->nullable();
             $table->string("qq")->nullable();
