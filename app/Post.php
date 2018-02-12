@@ -6,13 +6,26 @@ use Illuminate\Database\Eloquent\Model;
 
 class Post extends Model
 {
-    public function user()
+    public function getUser()
     {
-        return $this->belongsTo(User::class)->getResults();
+        return $this->belongsTo(User::class,'user_id','id')->getResults();
     }
 
-    public function comments()
+//    public function comments()
+//    {
+//        return $this->hasMany(Comment::class,'post_id','id');
+//    }
+
+    public function getArchive()
     {
-        return $this->hasMany(Comment::class,'post_id','id');
+        $archive = $this->belongsToMany(
+            Archive::class,
+            'post_archive',
+            'post_id',
+            'archive_id'
+            )->getResults()[0];
+        $parent_archive = Archive::find($archive->parent_id);
+        return [$parent_archive,$archive];
+//        return $archive;
     }
 }

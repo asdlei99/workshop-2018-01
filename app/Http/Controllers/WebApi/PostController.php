@@ -2,10 +2,12 @@
 
 namespace App\Http\Controllers\WebApi;
 
+use App\Archive;
 use App\Http\Requests\StorePostRequest;
 use App\Http\Requests\UpdatePostRequest;
 use App\Http\ReturnHelper;
 use App\Post;
+use App\PostArchive;
 use App\Transformers\PostTransformer;
 use Cyvelnet\Laravel5Fractal\Facades\Fractal;
 use Illuminate\Http\Request;
@@ -34,53 +36,85 @@ class PostController extends Controller
     {
         $post = Post::find($id);
         if($post === null){
-            return ReturnHelper::returnWithStatus(null,Response::HTTP_NOT_FOUND,'Not Found');
+            return ReturnHelper::returnWithStatus('未找到指定文章',2003);
         }
-
         return ReturnHelper::returnWithStatus(Fractal::includes('user')->item($post,new PostTransformer()));
     }
 
     public function store(StorePostRequest $request)
     {
+        //这里验证archive是否合法
+        $archive = Archive::find($request->input('archive'));
+        if(! ($archive !== null && $archive->parent_id > 0)){
+            return ReturnHelper::returnWithStatus('类别不合理',2002);
+        }
+
+
         $post = new Post();
         $post->title = $request->input('title');
         $post->body = $request->input('body');
+        $post->user_id = session('user')->id;
+        $post->anonymous = $request->input('anonymous');
         if($request->input('description')){
             $post->description = $request->input('description');
         }else{
             $post->description = $post->title;
         }
 
-        $post->user_id = session('user')->id;
-        $post->anonymous = $request->input('anonymous');
+        $post_archive = new PostArchive();
+        $post_archive->archive_id = $request->input('archive');
+
         try{
             $post->save();
-        }catch (\Exception $e){
-            return ReturnHelper::returnWithStatus(['errors'=>'文章储存失败，请稍后重试'],2002,'文章储存失败');
+            $post_archive->post_id = $post->id;
+            $post_archive->save();
+        }catch (\Exception $e) {
+            return ReturnHelper::returnWithStatus(['errors' => '文章储存失败，请稍后重试'], 2002);
 //            return ReturnHelper::returnWithStatus(['errors'=>$e->getMessage()],2002,'文章储存失败');
         }
-        //TODO archive 存入 post_archive表
-        return ReturnHelper::returnWithStatus(Fractal::includes('user')->item($post, new PostTransformer()));
+        return ReturnHelper::returnWithStatus(Fractal::item($post, new PostTransformer()));
     }
 
-    public function update(Request $request, $id)
+    public function update(StorePostRequest $request, $id)
     {
         $post = Post::find($id);
         if($post === null){
-            return ReturnHelper::returnWithStatus(null,Response::HTTP_NOT_FOUND,'Not Found');
+            return ReturnHelper::returnWithStatus('未找到指定文章',2003);
         }
 
-        //TODO 需要判断是否认证通过
+        // \App\User
+        $user = session('auth');
+        if($user->id !== $post->user_id){
+            return ReturnHelper::returnWithStatus('您可能并非文章作者，权限不足',2004);
+        }
 
-       if($request->isMethod('patch')){
-           $post->title = $request->input('title',$post->title);
-           $post->description = $request->input('description',$post->description);
-           $post->body = $request->input('body',$post->body);
-           $post->anonymous = $request->input('anonymous',$post->anonymous);
-       }
-       $post->save();
+        //这里验证archive是否合法
+        $archive = Archive::find($request->input('archive'));
+        if(! ($archive !== null && $archive->parent_id > 0)){
+            return ReturnHelper::returnWithStatus('类别不合理',2002);
+        }
 
-       return ReturnHelper::returnWithStatus(Fractal::includes('user')->item($post, new PostTransformer()));
+        $post->title = $request->input('title');
+        $post->body = $request->input('body');
+        $post->anonymous = $request->input('anonymous');
+        if($request->input('description')){
+            $post->description = $request->input('description');
+        }else{
+            $post->description = $post->title;
+        }
+
+        $post_archive = PostArchive::where('post_id','=',$post->id);
+        $post_archive->archive_id = $request->input('archive');
+
+        try{
+            $post->save();
+            $post_archive->save();
+        }catch (\Exception $e) {
+            return ReturnHelper::returnWithStatus(['errors' => '文章储存失败，请稍后重试'], 2002);
+//            return ReturnHelper::returnWithStatus(['errors'=>$e->getMessage()],2002,'文章储存失败');
+        }
+        return ReturnHelper::returnWithStatus(Fractal::item($post, new PostTransformer()));
+
     }
 
     public function destroy($id)

@@ -20,8 +20,8 @@ use Illuminate\Http\Request;
 Route::prefix('posts')->namespace('WebApi')->group(function() {
 //    Route::get('/home','PostController@index');
     Route::post('/','PostController@store')->middleware('auth');
-//    Route::get('/{post}','PostController@show');
-//    Route::patch('/{post}','PostController@update');
+    Route::get('/{post}','PostController@show');
+    Route::patch('/{post}','PostController@update')->middleware('auth');
 //    Route::delete('/{post}','PostController@destroy');
 });
 

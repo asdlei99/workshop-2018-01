@@ -17,7 +17,8 @@ class CreatePostArchiveTable extends Migration
             $table->increments('id');
             $table->integer('post_id')->unsigned();
             $table->integer('archive_id')->unsigned();
-            $table->timestamp('created_at', 0)->nullable();
+            $table->timestamps();
+//            $table->timestamp('created_at', 0)->nullable();
         });
     }
 

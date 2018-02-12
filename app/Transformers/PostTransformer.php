@@ -17,14 +17,15 @@ class PostTransformer extends TransformerAbstract
      *
      * @var array
      */
-    protected $availableIncludes = ['user'];
+    protected $availableIncludes = [];
 
     /**
      * List of resources to automatically include
      *
      * @var array
      */
-    protected $defaultIncludes = [];
+    protected $defaultIncludes = ['archive','user'];
+    //TODO 类别
 
     /**
      * Transform object into a generic array
@@ -39,7 +40,6 @@ class PostTransformer extends TransformerAbstract
             'title' => $post->title,
             'description' => $post->description,
             'body' => $post->body,
-//            'user_id' => $post->user_id,
             'anonymous' => $post->anoymous,
             'views' => $post->views,
             'date' => Carbon::parse($post->created_at)->format("Y M d H:m:s") ,
@@ -52,12 +52,16 @@ class PostTransformer extends TransformerAbstract
      */
     public function includeUser(Post $post)
     {
-
         if($post->anonymous){   //判断是否匿名
             return null;
         }else{
-            return $this->item($post->user(),new UserSelfTransformer());
+            return $this->item($post->getUser(),new UserOtherTransformer());
         }
+    }
 
+    public function includeArchive(Post $post)
+    {
+        return $this->collection($post->getArchive(),new ArchiveTransformer());
+        return $this->item($post->getArchive(),new ArchiveTransformer());
     }
 }

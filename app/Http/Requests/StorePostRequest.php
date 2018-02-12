@@ -26,8 +26,10 @@ class StorePostRequest extends FormRequest
     public function rules()
     {
         return [
-            'title' => 'required',
+            'title' => 'required|max:255',
             'body' => 'required',
+            'archive' => 'required|numeric',
+            'description' => 'max:255',
         ];
     }
 
@@ -35,7 +37,11 @@ class StorePostRequest extends FormRequest
     {
         return [
             'title.required' => '标题不能为空',
+            'title.max' => '标题长度不可超过255',
             'body.required' => '正文不能为空',
+            'archive.required' => '类别不能为空',
+            'archive.numeric' => '类别应为数字',
+            'description.max' => '描述长度不可超过255',
         ];
     }
     
@@ -48,8 +54,7 @@ class StorePostRequest extends FormRequest
         }
         exit(json_encode(ReturnHelper::returnWithStatus(
             $expected_errors_array,
-            2001,
-            '文章、标题因长度等原因未能被服务器接受'
+            2001
         )));
     }
 

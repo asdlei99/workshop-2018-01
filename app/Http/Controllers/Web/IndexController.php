@@ -34,11 +34,11 @@ class IndexController extends Controller
                         'state' => $request->input('state',null),
                         ]);
                 }else{
-                    return ReturnHelper::returnWithStatus(['errors'=> '认证失败'],403,'Forbidden');
+                    return ReturnHelper::returnWithStatus('认证失败',403);
                 }
 
             }else{
-                return ReturnHelper::returnWithStatus(['errors'=> 'Invalid state'],401,'Unauthorized');
+                return ReturnHelper::returnWithStatus('Invalid state',401);
             }
         }else{
             return $provider->redirectToAuthorizationUrl();

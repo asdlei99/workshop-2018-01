@@ -59,29 +59,18 @@ class ReturnHelper
      * @param string $status
      * @return array
      */
-    public static function returnWithStatus($data = null, $code = 200, $status = 'OK')
+    public static function returnWithStatus($data = null, $code = 200)
     {
-        if(is_object($data)){
+        if(is_a($data,'\Cyvelnet\Laravel5Fractal\Adapters\ScopeDataAdapter')){
             return [
-//                'data' => json_decode($data->toJSON(),true)['data'],
                 'data' => json_decode($data->toJSON(),true),
                 'code' => $code,
-                'status' => $status,
-            ];
-        }
-
-        if(is_array($data) && key_exists('errors',$data)){
-            return [
-                'errors' => $data['errors'],
-                'code' => $code,
-                'status' => $status,
             ];
         }
 
         return [
             'data' => $data,
             'code' => $code,
-            'status' => $status,
         ];
     }
 }
