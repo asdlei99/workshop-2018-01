@@ -42,9 +42,10 @@ class PostTransformer extends TransformerAbstract
             'body' => $post->body,
             'anonymous' => $post->anoymous,
             'views' => $post->views,
-            'date' => Carbon::parse($post->created_at)->format("Y M d H:m:s") ,
+            'created_at' => Carbon::parse($post->created_at)->format("Y-m-d h:i:s") ,
+            'updated_at' => Carbon::parse($post->updated_at)->format("Y-m-d h:i:s") ,
         ];
-    }
+}
 
     /**
      * @param Post $post

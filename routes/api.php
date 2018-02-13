@@ -18,18 +18,18 @@ use Illuminate\Http\Request;
 //});
 
 Route::prefix('posts')->namespace('WebApi')->group(function() {
-//    Route::get('/home','PostController@index');
+    Route::get('/home','PostController@index');
     Route::post('/','PostController@store')->middleware('auth');
     Route::get('/{post}','PostController@show');
     Route::patch('/{post}','PostController@update')->middleware('auth');
-//    Route::delete('/{post}','PostController@destroy');
+    Route::delete('/{post}','PostController@destroy')->middleware('auth');
 });
 
-Route::prefix('comments')->namespace('WebApi')->group(function (){
-    Route::post('/posts/{post}','CommentController@addToPost');
-    Route::post('/comments/{comment}','CommentController@addToComment');
-    Route::delete('/comments/{comment}','CommentController@destroy');
-});
+//Route::prefix('comments')->namespace('WebApi')->group(function (){
+//    Route::post('/posts/{post}','CommentController@addToPost');
+//    Route::post('/comments/{comment}','CommentController@addToComment');
+//    Route::delete('/comments/{comment}','CommentController@destroy');
+//});
 
 Route::prefix('users')->namespace('WebApi')->group(function(){
     Route::post('/','UserController@create');
@@ -39,5 +39,8 @@ Route::prefix('users')->namespace('WebApi')->group(function(){
     Route::get('/{username}/info','UserController@getInfo');
 });
 
+Route::get('/archives/{archive}','WebApi\\PostController@showByArchive');
+
+Route::get('/archives','WebApi\\archiveController@show');
 
 

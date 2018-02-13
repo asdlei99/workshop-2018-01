@@ -12,25 +12,20 @@ use App\Transformers\PostTransformer;
 use Cyvelnet\Laravel5Fractal\Facades\Fractal;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Response;
-use League\Fractal\Manager;
-use League\Fractal\Resource\Collection;
-use League\Fractal\Resource\Item;
+use Illuminate\Support\Facades\DB;
 
 
 class PostController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $cnt = \request('cnt') ? \request('cnt'): 3;
-        $posts = Post::take($cnt)->get();
+        $cnt = $request->input('cnt',15);
+        $posts = Post::take($cnt)->orderBy('id', 'desc')->simplePaginate($cnt);
 
         return ReturnHelper::returnWithStatus(
-            Fractal::includes('user')->collection($posts,new PostTransformer())
+            Fractal::collection($posts,new PostTransformer())
         );
-
     }
-
 
     public function show($id)
     {
@@ -83,7 +78,7 @@ class PostController extends Controller
         }
 
         // \App\User
-        $user = session('auth');
+        $user = session('user');
         if($user->id !== $post->user_id){
             return ReturnHelper::returnWithStatus('您可能并非文章作者，权限不足',2004);
         }
@@ -103,36 +98,53 @@ class PostController extends Controller
             $post->description = $post->title;
         }
 
-        $post_archive = PostArchive::where('post_id','=',$post->id);
+        $post_archive = PostArchive::where('post_id','=',$post->id)->first();
         $post_archive->archive_id = $request->input('archive');
 
         try{
             $post->save();
             $post_archive->save();
         }catch (\Exception $e) {
-            return ReturnHelper::returnWithStatus(['errors' => '文章储存失败，请稍后重试'], 2002);
-//            return ReturnHelper::returnWithStatus(['errors'=>$e->getMessage()],2002,'文章储存失败');
+            return ReturnHelper::returnWithStatus('文章储存失败，请稍后重试', 2002);
         }
         return ReturnHelper::returnWithStatus(Fractal::item($post, new PostTransformer()));
-
     }
 
     public function destroy($id)
     {
-        //TODO 判断是否认证通过
-
         $post = Post::find($id);
         if($post === null){
-            return ReturnHelper::returnWithStatus(null,Response::HTTP_NOT_FOUND,'Post Not Found');
+            return ReturnHelper::returnWithStatus('未找到指定文章',2003);
         }
+        if(session('user')->id !== $post->user_id){
+            return ReturnHelper::returnWithStatus('您可能并非文章作者，权限不足',2004);
+        }
+        $post_archive = PostArchive::where('post_id',$id)->first();
         try{
             $post->delete();
+            $post_archive->delete();
         }catch (\Exception $e){
-            return ReturnHelper::returnWithStatus(null,Response::HTTP_PRECONDITION_FAILED,'Deleted Failed');
-//            return $e->getMessage();
+            return ReturnHelper::returnWithStatus('文章删除失败，请稍后重试',2002);
         }
-
         return ReturnHelper::returnWithStatus('true');
+    }
 
+    public function showByArchive(Request $request, $id)
+    {
+        $cnt = $request->input('cnt',15);
+        $archive = Archive::find($id);
+        if($archive === null){
+            return ReturnHelper::returnWithStatus('类别不存在',2005);
+        }
+        if($archive->parent_id === 0){
+            $archives = Archive::where('parent_id','=',$archive->id)->pluck('id')->toArray();
+            $post_archives = PostArchive::whereIn('archive_id', $archives)->simplePaginate($cnt)->toArray();
+        }else{
+            $post_archives = PostArchive::where('archive_id',$archive->id)->simplePaginate($cnt)->toArray();
+        }
+        $post_ids = array_map(function($post_archive){return $post_archive['post_id'];},$post_archives['data']);
+
+        $posts = Post::whereIn('id',$post_ids)->simplePaginate($cnt);
+        return ReturnHelper::returnWithStatus(Fractal::collection($posts, new PostTransformer()));
     }
 }
