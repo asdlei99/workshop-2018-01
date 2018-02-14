@@ -6,9 +6,12 @@ use App\Comment;
 use App\Http\Requests\AddComment;
 use App\Http\ReturnHelper;
 use App\Post;
+use App\Transformers\CommentTransformer;
 use Carbon\Carbon;
 use App\Http\Controllers\Controller;
+use Cyvelnet\Laravel5Fractal\Facades\Fractal;
 use Illuminate\Http\Response;
+use function Sodium\crypto_box_publickey_from_secretkey;
 
 class CommentController extends Controller
 {
@@ -16,58 +19,68 @@ class CommentController extends Controller
     {
         $post = Post::find($id);
         if(null === $post){
-            return ReturnHelper::returnWithStatus(null,Response::HTTP_NOT_FOUND,'Post Not Found');
+            return ReturnHelper::returnWithStatus('未找到指定文章',2003);
         }
 
         $comment = new Comment();
         $comment->post_id = $id;
-        $comment->user_id = $request->input('user_id',1);
-//        $comment->user_id = $request->user()->id;
+        $comment->user_id = session('user')->id;
         $comment->parent_id = 0;
         $comment->level = 1;
         $comment->body = $request->input('body');
-        $comment->created_at = Carbon::now();
         try{
             $comment->save();
         }catch (\Exception $e){
-            return ReturnHelper::returnWithStatus(['errors' => $e->getMessage()],Response::HTTP_FORBIDDEN,'Comment Save Failed');
+            return ReturnHelper::returnWithStatus('评论失败',3001);
         }
 
-        return ReturnHelper::returnWithStatus(['post_id' => $comment->post_id]);
+        return ReturnHelper::returnWithStatus(Fractal::item($comment,new CommentTransformer()));
     }
 
     public function addToComment(AddComment $request, $id)
     {
         $parent_comment = Comment::find($id);
         if(null === $parent_comment){
-            return ReturnHelper::returnWithStatus(null,Response::HTTP_NOT_FOUND,'Comment Not Found');
+            return ReturnHelper::returnWithStatus('未找到指定评论',3002);
         }
 
         $comment = new Comment();
         $comment->post_id = $parent_comment->post_id;
-        $comment->user_id = 2;
-        $comment->parent_id = $id;
+        $comment->user_id = session('user')->id;
+        $comment->parent_id = ($parent_comment->level === 3 ) ? $parent_comment->parent_id : $id;
         $comment->level = ($parent_comment->level == 1 )? 2 : 3;
         $comment->body = $request->input('body');
-        $comment->created_at = Carbon::now();
 
         try{
             $comment->save();
         }catch (\Exception $e){
-            return ReturnHelper::returnWithStatus(['errors' => $e->getMessage()],Response::HTTP_FORBIDDEN,'Comment Save Failed');
+            return ReturnHelper::returnWithStatus('评论失败',3001);
         }
 
-        return ReturnHelper::returnWithStatus(['post_id'=>$comment->post_id]);
+        return ReturnHelper::returnWithStatus(Fractal::item($comment,new CommentTransformer()));
     }
 
     public function destroy($id)
     {
-        //TODO 身份认证
-        $parent_comment = Comment::find($id);
-        if(null === $parent_comment){
-            return ReturnHelper::returnWithStatus(null,Response::HTTP_NOT_FOUND,'Comment Not Found');
+        $comment = Comment::find($id);
+        if(null === $comment){
+            return ReturnHelper::returnWithStatus('未找到指定评论',3002);
         }
-        $parent_comment->deleteSelfAndChildren();
-        return ReturnHelper::returnWithStatus() ;
+
+        try{
+            $comment->deleteSelfAndChildren();
+        }catch (\Exception $e){
+            return ReturnHelper::returnWithStatus('删除评论失败',3001);
+        }
+
+        return ReturnHelper::returnWithStatus('删除评论成功');
     }
+
+    public function getPostComments($post_id)
+    {
+        $post = Post::find($post_id);
+        $comments = $post->getComments();
+        return ReturnHelper::returnWithStatus(Fractal::collection($comments, new CommentTransformer()));
+    }
+
 }

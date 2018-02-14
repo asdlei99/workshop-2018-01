@@ -3,6 +3,7 @@
 namespace App\Transformers;
 
 use App\Comment;
+use Carbon\Carbon;
 use League\Fractal;
 use League\Fractal\TransformerAbstract;
 use League\Fractal\Resource\Collection;
@@ -40,16 +41,16 @@ class CommentTransformer extends TransformerAbstract
             'parent_id' => $comment->parent_id,
             'level' => $comment->level,
             'body' => $comment->body,
-            'created_at' => $comment->created_at,
+            'created_at' => Carbon::parse($comment->created_at)->format("Y-m-d h:i:s"),
         ];
     }
 
-    public function includeChildren(Comment $comment)
-    {
-        if($comment->level > 1){
-            return null;
-        }else{
-            return $this->collection($comment->children(),new CommentTransformer());
-        }
-    }
+//    public function includeChildren(Comment $comment)
+//    {
+//        if($comment->level > 1){
+//            return null;
+//        }else{
+//            return $this->collection($comment->children(),new CommentTransformer());
+//        }
+//    }
 }

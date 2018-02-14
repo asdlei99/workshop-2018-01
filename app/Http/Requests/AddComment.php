@@ -27,4 +27,11 @@ class AddComment extends FormRequest
             'body' => 'required',
         ];
     }
+
+    public function messages()
+    {
+        return [
+            'body.required' => '评论正文不能为空',
+        ];
+    }
 }

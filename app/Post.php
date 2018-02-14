@@ -14,10 +14,10 @@ class Post extends Model
         return $this->belongsTo(User::class,'user_id','id')->getResults();
     }
 
-//    public function comments()
-//    {
-//        return $this->hasMany(Comment::class,'post_id','id');
-//    }
+    public function getComments()
+    {
+        return $this->hasMany(Comment::class,'post_id','id')->getResults();
+    }
 
     public function getArchive()
     {
