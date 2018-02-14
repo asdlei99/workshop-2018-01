@@ -17,14 +17,14 @@ class CommentTransformer extends TransformerAbstract
      *
      * @var array
      */
-    protected $availableIncludes = ['post','user','comment'];
+    protected $availableIncludes = [];
 
     /**
      * List of resources to automatically include
      *
      * @var array
      */
-    protected $defaultIncludes = [];
+    protected $defaultIncludes = ['user','popularity'];
 
     /**
      * Transform object into a generic array
@@ -45,12 +45,13 @@ class CommentTransformer extends TransformerAbstract
         ];
     }
 
-//    public function includeChildren(Comment $comment)
-//    {
-//        if($comment->level > 1){
-//            return null;
-//        }else{
-//            return $this->collection($comment->children(),new CommentTransformer());
-//        }
-//    }
+    public function includePopularity(Comment $comment)
+    {
+        return $this->item($comment->getPopularity(),new CommentPopularityTransformer());
+    }
+
+    public function includeUser(Comment $comment)
+    {
+        return $this->item($comment->getUser(), new UserOtherTransformer());
+    }
 }

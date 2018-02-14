@@ -20,7 +20,6 @@ class CreatePostsTable extends Migration
             $table->longText("body");
             $table->integer("user_id")->unsigned();
             $table->boolean("anonymous")->default(false);
-            $table->integer("views")->default(0);
             $table->timestamps();
             $table->softDeletes();
         });

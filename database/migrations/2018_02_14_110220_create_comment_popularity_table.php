@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreatePostPopularityTable extends Migration
+class CreateCommentPopularityTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,13 +13,12 @@ class CreatePostPopularityTable extends Migration
      */
     public function up()
     {
-        Schema::create('post_popularity', function (Blueprint $table) {
-            $table->integer('post_id')->unsigned()->comment('同post表的id');
-            $table->primary('post_id');
+        Schema::create('comment_popularity', function (Blueprint $table) {
+            $table->integer('comment_id')->unsigned();
+            $table->primary('comment_id');
             $table->integer('like_count')->unsigned()->default(0);
             $table->integer('comment_count')->unsigned()->default(0);
             $table->integer('favorite_count')->unsigned()->default(0);
-            $table->integer('view_count')->unsigned()->default(0);
             $table->timestamps();
             $table->softDeletes();
         });
@@ -32,6 +31,6 @@ class CreatePostPopularityTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('post_popularity');
+        Schema::dropIfExists('comment_popularity');
     }
 }

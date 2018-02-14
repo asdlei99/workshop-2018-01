@@ -9,6 +9,8 @@ class Comment extends Model
 {
     use SoftDeletes;
 
+    protected $table = 'comments';
+
     protected $dates = ['deleted_at'];
 
     /**
@@ -24,12 +26,13 @@ class Comment extends Model
      */
     public function deleteSelfAndChildren()
     {
-        //感觉这里写的非常糟糕
+        $cnt = 1;
         if($this->level === 3){
             $this->delete();
         }elseif($this->level === 2){
             $children = $this->getChildren();
             foreach ($children as $child){
+                $cnt++;
                 $child->delete();
             }
             $this->delete();
@@ -38,19 +41,32 @@ class Comment extends Model
             foreach ($children as $child){
                 $grand_children = $child->getChildren();
                 foreach ($grand_children as $grand_child){
+                    $cnt++;
                     $grand_child->delete();
                 }
+                $cnt++;
                 $child->delete();
             }
             $this->delete();
         }
+        return $cnt;
     }
 
 
-//    public function getPost()
-//    {
-//        return $this->belongsTo(Post::class,'post_id','id')->getResults();
-//    }
-//
+    public function getPost()
+    {
+        return $this->belongsTo(Post::class,'post_id','id')->getResults();
+    }
+
+    public function getPopularity()
+    {
+        return CommentPopularity::find($this->id);
+    }
+
+
+    public function getUser()
+    {
+        return $this->belongsTo(User::class,'user_id','id')->getResults();
+    }
 
 }

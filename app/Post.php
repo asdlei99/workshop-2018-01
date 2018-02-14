@@ -29,6 +29,10 @@ class Post extends Model
             )->getResults()[0];
         $parent_archive = Archive::find($archive->parent_id);
         return [$parent_archive,$archive];
-//        return $archive;
+    }
+
+    public function getPopularity()
+    {
+        return PostPopularity::find($this->id);
     }
 }

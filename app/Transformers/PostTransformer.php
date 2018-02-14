@@ -24,8 +24,7 @@ class PostTransformer extends TransformerAbstract
      *
      * @var array
      */
-    protected $defaultIncludes = ['archive','user'];
-    //TODO 类别
+    protected $defaultIncludes = ['archive','user','popularity'];
 
     /**
      * Transform object into a generic array
@@ -63,6 +62,10 @@ class PostTransformer extends TransformerAbstract
     public function includeArchive(Post $post)
     {
         return $this->collection($post->getArchive(),new ArchiveTransformer());
-        return $this->item($post->getArchive(),new ArchiveTransformer());
+    }
+
+    public function includePopularity(Post $post)
+    {
+        return $this->item($post->getPopularity(),new PostPopularityTransformer());
     }
 }
