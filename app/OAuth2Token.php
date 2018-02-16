@@ -34,4 +34,5 @@ class OAuth2Token extends Model
         }
         return $token_to_save->id;
     }
+
 }

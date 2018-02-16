@@ -34,6 +34,7 @@ class PostTransformer extends TransformerAbstract
      */
     public function transform(Post $post)
     {
+
         return [
             'id' => $post->id,
             'title' => $post->title,

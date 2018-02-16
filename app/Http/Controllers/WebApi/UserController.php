@@ -4,6 +4,7 @@ namespace App\Http\Controllers\WebApi;
 
 use App\Http\Requests\CreateUser;
 use App\Http\ReturnHelper;
+use App\Transformers\PostTransformer;
 use App\Transformers\UserOtherTransformer;
 use App\Transformers\UserSelfTransformer;
 use Cantjie\Oauth2\Provider;
@@ -127,5 +128,13 @@ class UserController extends Controller
     {
         $user = User::getUserByUsername($username);
         return ReturnHelper::returnWithStatus(Fractal::item($user,new UserOtherTransformer()));
+    }
+
+    public function getPublished()
+    {
+        $user = session('user');
+//        $published = $user->getPosts();
+        $published = $user->posts()->simplePaginate();
+        return ReturnHelper::returnWithStatus(Fractal::collection($published,new PostTransformer()));
     }
 }

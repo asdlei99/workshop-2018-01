@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\WebApi;
 
 use App\Comment;
+use App\CommentMessageControl;
 use App\CommentPopularity;
 use App\Http\Requests\AddComment;
 use App\Http\ReturnHelper;
@@ -24,9 +25,11 @@ class CommentController extends Controller
             return ReturnHelper::returnWithStatus('未找到指定文章',2003);
         }
 
+        $user_id = session('user')->id;
+
         $comment = new Comment();
         $comment->post_id = $id;
-        $comment->user_id = session('user')->id;
+        $comment->user_id = $user_id;
         $comment->parent_id = 0;
         $comment->level = 1;
         $comment->body = $request->input('body');
@@ -34,12 +37,20 @@ class CommentController extends Controller
         $post_popularity = $post->getPopularity();
         $post_popularity->comment_count = $post_popularity->commen_count + 1;
 
+        $comment_message = new CommentMessageControl();
+        $comment_message->user_id = $user_id;
+
         $comment_popularity = new CommentPopularity();
         try{
             $comment->save();
+
             $post_popularity->save();
+
             $comment_popularity->comment_id = $comment->id;
             $comment_popularity->save();
+
+            $comment_message->comment_id = $comment->id;
+            $comment_message->save();
         }catch (\Exception $e){
             return ReturnHelper::returnWithStatus('评论失败',3001);
         }

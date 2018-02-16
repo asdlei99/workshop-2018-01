@@ -26,6 +26,7 @@ Route::prefix('users')->namespace('WebApi')->group(function(){
     Route::delete('/','UserController@destroy')->middleware('auth');
     Route::post('/info','UserController@getSelfInfo')->middleware('auth');
     Route::get('/{username}/info','UserController@getInfo');
+    Route::post('/publish','UserController@getPublished')->middleware('auth');
 });
 
 /**
