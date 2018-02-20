@@ -63,7 +63,6 @@ class Comment extends Model
         return CommentPopularity::find($this->id);
     }
 
-
     public function getUser()
     {
         return $this->belongsTo(User::class,'user_id','id')->getResults();

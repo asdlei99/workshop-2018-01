@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateLikeMessageControlTable extends Migration
+class CreateCommentLikeMessageControlTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,9 +13,9 @@ class CreateLikeMessageControlTable extends Migration
      */
     public function up()
     {
-        Schema::create('like_message_control', function (Blueprint $table) {
+        Schema::create('comment_like_message_control', function (Blueprint $table) {
             $table->increments('id');
-            $table->integer('user_id')->unsigned();
+            $table->integer('user_id')->unsigned()->comment('target user');
             $table->integer('like_id')->unsigned();
             $table->boolean('has_read')->default(0);
             $table->timestamps();
@@ -29,6 +29,6 @@ class CreateLikeMessageControlTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('like_message_control');
+        Schema::dropIfExists('comment_like_message_control');
     }
 }

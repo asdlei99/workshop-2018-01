@@ -47,7 +47,11 @@ class CommentTransformer extends TransformerAbstract
 
     public function includePopularity(Comment $comment)
     {
-        return $this->item($comment->getPopularity(),new CommentPopularityTransformer());
+        if($comment->level !== 1){
+            return null;
+        }else{
+            return $this->item($comment->getPopularity(),new CommentPopularityTransformer());
+        }
     }
 
     public function includeUser(Comment $comment)

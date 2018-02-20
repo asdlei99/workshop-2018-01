@@ -2,20 +2,27 @@
 
 namespace App\Http\Controllers\WebApi;
 
+use App\CommentLikeMessageControl;
+use App\CommentMessageControl;
 use App\Http\Requests\CreateUser;
 use App\Http\ReturnHelper;
+use App\PostLikeMessageControl;
+use App\Providers\EventServiceProvider;
+use App\Transformers\MessageControlTransformer;
 use App\Transformers\PostTransformer;
 use App\Transformers\UserOtherTransformer;
 use App\Transformers\UserSelfTransformer;
 use Cantjie\Oauth2\Provider;
 use App\Http\Controllers\Controller;
 use App\User;
+use Carbon\Carbon;
 use Cyvelnet\Laravel5Fractal\Facades\Fractal;
 use Illuminate\Http\Request;
 use App\OAuth2Token;
 
 class UserController extends Controller
 {
+    //仅在创建新用户中使用了。
     protected function __checkToken($request){
         $oauth2token = OAuth2Token::find($request->input('token_id',0));
 
@@ -130,6 +137,7 @@ class UserController extends Controller
         return ReturnHelper::returnWithStatus(Fractal::item($user,new UserOtherTransformer()));
     }
 
+    //获取已发布文章列表
     public function getPublished()
     {
         $user = session('user');
@@ -137,4 +145,86 @@ class UserController extends Controller
         $published = $user->posts()->simplePaginate();
         return ReturnHelper::returnWithStatus(Fractal::collection($published,new PostTransformer()));
     }
+
+
+    //个人中心——获得评论自己的消息
+    public function getCommentMessage()
+    {
+        $messages = CommentMessageControl::getByUserId(session('user'));
+        return ReturnHelper::returnWithStatus(Fractal::collection($messages,new MessageControlTransformer()));
+    }
+    
+    //个人中心——将评论自己的消息标记为已读
+    public function readCommentMessage($id)
+    {
+        $message = CommentMessageControl::find($id);
+        if($message === null){
+            return ReturnHelper::returnWithStatus('未找到该记录',5001);
+        }
+        $message->has_read = 1;
+        try{
+            $message->save();
+        }catch (\Exception $e){
+            return ReturnHelper::returnWithStatus('标记已读失败',5002);
+        }
+        return ReturnHelper::returnWithStatus();
+    }
+
+    //个人中心——获得给自己点的赞
+    public function getLikeMessage()
+    {
+        $user_id = session('user')->id;
+        $comment_likes = CommentLikeMessageControl::getByUserId($user_id);
+        $post_likes = PostLikeMessageControl::getByUserId($user_id);
+
+        $j = count($comment_likes)- 1;
+        $k = count($post_likes) - 1;
+        $likes = [];
+        for ($i = 0; ($k>=0 && $j>=0);$i++){
+            if($comment_likes[$j]->created_at > $post_likes[$k]->created_at){
+                $likes[$i] = $comment_likes[$j];
+                $j--;
+            }else{
+                $likes[$i] = $post_likes[$k];
+                $k--;
+            }
+        }
+
+        if($k < 0){
+            for(; $j >= 0; $i++,$j--){
+                $likes[$i] = $comment_likes[$j];
+            }
+        }else{
+            for(; $k >= 0;$i++,$k--){
+                $likes[$j] = $post_likes[$k];
+            }
+        }
+
+        return ReturnHelper::returnWithStatus(Fractal::collection($likes,new MessageControlTransformer()));
+    }
+
+    //个人中心——将给自己点赞的消息标记为已读
+    public function readLikeMessage($request, $id)
+    {
+        $like_type = $request->input('like_type','comment');
+        if($like_type === 'comment'){
+            $like_message = CommentLikeMessageControl::find($id);
+        }elseif($like_type === 'post'){
+            $like_message = PostLikeMessageControl::find($id);
+        }
+
+        if($like_message === null){
+            return ReturnHelper::returnWithStatus('未找到该记录',5001);
+        }
+
+        try{
+            $like_message->save();
+        }catch (\Exception $e){
+            return ReturnHelper::returnWithStatus('标记已读失败',5002);
+        }
+
+        return ReturnHelper::returnWithStatus();
+
+    }
+    
 }

@@ -3,8 +3,10 @@
 namespace App\Http\Controllers\WebApi;
 
 use App\CommentLike;
+use App\CommentLikeMessageControl;
 use App\Http\ReturnHelper;
 use App\PostLike;
+use App\PostLikeMessageControl;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
@@ -19,29 +21,50 @@ class LikeController extends Controller
         if($post === null){
             return ReturnHelper::returnWithStatus('未找到指定文章',2003);
         }
+
         $user_id = session('user')->id;
+
         $post_popularity = $post->getPopularity();
+
         $post_like = PostLike::where('user_id',$user_id)->where('post_id',$id)->first();
+
+
         if($post_like !== null){
-            //点过赞了，那就取消赞
+            //取消赞
             $post_popularity->like_count = $post_popularity->like_count - 1;
+
+            $post_like_message = PostLikeMessageControl::findByLikeId($post_like->id);
+
             try{
                 $post_popularity->save();
                 $post_like->delete();
+                $post_like_message->delete();
+
             }catch (\Exception $e){
                 return ReturnHelper::returnWithStatus('取消赞失败',4002);
             }
             return ReturnHelper::returnWithStatus('取消赞成功',4102);
+
         }else{
-            //没点过赞就点赞
+            //点赞
+
             $post_like = new PostLike();
             $post_like->user_id = $user_id;
             $post_like->post_id = $id;
             $post_like->created_at = Carbon::now();
+
             $post_popularity->like_count = $post_popularity->like_count + 1;
+
+            $post_like_message = new PostLikeMessageControl();
+            $post_like_message->user_id = $post->user_id;
+
             try{
                 $post_popularity->save();
                 $post_like->save();
+
+                $post_like_message->like_id = $post_like->id;
+                $post_like_message->save();
+
             }catch (\Exception $e){
                 return ReturnHelper::returnWithStatus('点赞失败',4001);
             }
@@ -56,31 +79,41 @@ class LikeController extends Controller
         }
 
         $user_id = session('user')->id;
-        $commment_like = CommentLike::where('user_id',$user_id)->where('comment_id',$id)->first();
+        $comment_like = CommentLike::where('user_id',$user_id)->where('comment_id',$id)->first();
         $comment_popularity = $comment->getPopularity();
 
-        if($commment_like !== null){
-            //点过赞了，那就取消赞
+        if($comment_like !== null){
+            //取消赞
             $comment_popularity->like_count = $comment_popularity->like_count - 1;
+
+            $comment_like_control = CommentLikeMessageControl::findByLikeId($comment_like->id);
+
             try{
-                $commment_like->delete();
+                $comment_like->delete();
                 $comment_popularity->save();
+                $comment_like_control->delete();
             }catch (\Exception $e){
                 return ReturnHelper::returnWithStatus('取消赞失败',4002);
             }
             return ReturnHelper::returnWithStatus('取消赞成功',4102);
         }else{
-            //没点过赞就点赞
-            $commment_like = new CommentLike();
-            $commment_like->user_id = $user_id;
-            $commment_like->comment_id = $id;
-            $commment_like->created_at = Carbon::now();
+            //点赞
+            $comment_like = new CommentLike();
+            $comment_like->user_id = $user_id;
+            $comment_like->comment_id = $id;
+            $comment_like->created_at = Carbon::now();
 
             $comment_popularity->like_count = $comment_popularity->like_count + 1;
 
+            $comment_like_control = new CommentLikeMessageControl();
+            $comment_like_control->user_id = $comment->user_id;
+
             try{
-                $commment_like->save();
+                $comment_like->save();
                 $comment_popularity->save();
+
+                $comment_like_control->like_id = $comment_like->id;
+                $comment_like_control->save();
             }catch (\Exception $e){
                 return ReturnHelper::returnWithStatus('点赞失败',4001);
             }

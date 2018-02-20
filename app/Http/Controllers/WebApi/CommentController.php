@@ -38,7 +38,7 @@ class CommentController extends Controller
         $post_popularity->comment_count = $post_popularity->commen_count + 1;
 
         $comment_message = new CommentMessageControl();
-        $comment_message->user_id = $user_id;
+        $comment_message->user_id = $post->user_id;
 
         $comment_popularity = new CommentPopularity();
         try{
@@ -51,6 +51,7 @@ class CommentController extends Controller
 
             $comment_message->comment_id = $comment->id;
             $comment_message->save();
+
         }catch (\Exception $e){
             return ReturnHelper::returnWithStatus('评论失败',3001);
         }
@@ -64,6 +65,9 @@ class CommentController extends Controller
         if(null === $parent_comment){
             return ReturnHelper::returnWithStatus('未找到指定评论',3002);
         }
+
+        $user_id = session('user')->id;
+
         $post_popularity = $parent_comment->getPost()->getPopularity();
         $post_popularity->comment_count = $post_popularity->comment_count + 1;
 
@@ -72,19 +76,22 @@ class CommentController extends Controller
 
         $comment = new Comment();
         $comment->post_id = $parent_comment->post_id;
-        $comment->user_id = session('user')->id;
+        $comment->user_id = $user_id;
         $comment->parent_id = ($parent_comment->level === 3 ) ? $parent_comment->parent_id : $id;
         $comment->level = ($parent_comment->level == 1 )? 2 : 3;
         $comment->body = $request->input('body');
 
-//        $comment_popularity = new CommentPopularity();
+        $comment_message = new CommentMessageControl();
+        $comment_message->user_id = $parent_comment->user_id;
 
         try{
             $comment->save();
             $post_popularity->save();
-//            $comment_popularity->comment_id = $comment->id;
-//            $comment_popularity->save();
+
             $parent_comment_popularity->save();
+
+            $comment_message->comment_id = $comment->id;
+            $comment_message->save();
         }catch (\Exception $e){
             return ReturnHelper::returnWithStatus('评论失败',3001);
         }
@@ -94,6 +101,7 @@ class CommentController extends Controller
 
     public function destroy($id)
     {
+        //todo 删除的时候CommentMessageControl要不要删除? 目前没删除
         $comment = Comment::find($id);
         if(null === $comment){
             return ReturnHelper::returnWithStatus('未找到指定评论',3002);
