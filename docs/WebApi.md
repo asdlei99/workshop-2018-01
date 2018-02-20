@@ -1,35 +1,20 @@
 # WebApi
 
+## 路径说明
+    
+    {{server}} 表示 http://servername/api
+    {{webserver}} 表示 http://servername
 
-{{server}} 表示 http://host/api
-## Post
+## 数据返回格式
 
-发表文章  
-
-返回
-```JSON
+统一返回json格式数据
+```
 {
-    "data": {
-        "id": 1,
-        "title": "第一篇文章标题",
-        "description": "第一篇文章描述",
-        "body": "第一篇文章正文",
-        "anonymous": null,
-        "views": 84,
-        "date": "2018 Feb 03 09:02:43",
-        "user": {
-            "data": {
-                "id": 1,
-                "username": "kohler.noelia",
-                "nickname": "kohler.noelia",
-                "head_img": null,
-                "user_group": 3,
-                "email": "bechtelar.jerad@example.com",
-                "qq": null
-            }
-        }
-    },
     "code": 200,
-    "status": "OK"
+    "data": []
 }
 ```
+* data部分可以是{}或[]
+* code=200表示成功，返回其他code请见 状态码.md
+
+
