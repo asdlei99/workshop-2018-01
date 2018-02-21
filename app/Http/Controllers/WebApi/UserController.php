@@ -8,6 +8,8 @@ use App\Http\Requests\CreateUser;
 use App\Http\ReturnHelper;
 use App\PostLikeMessageControl;
 use App\Providers\EventServiceProvider;
+use App\SystemMessageControl;
+use App\SystemMessageText;
 use App\Transformers\MessageControlTransformer;
 use App\Transformers\PostTransformer;
 use App\Transformers\UserOtherTransformer;
@@ -137,7 +139,8 @@ class UserController extends Controller
         return ReturnHelper::returnWithStatus(Fractal::item($user,new UserOtherTransformer()));
     }
 
-    //获取已发布文章列表
+
+    //个人中心——获取已发布文章列表
     public function getPublished()
     {
         $user = session('user');
@@ -145,7 +148,6 @@ class UserController extends Controller
         $published = $user->posts()->simplePaginate();
         return ReturnHelper::returnWithStatus(Fractal::collection($published,new PostTransformer()));
     }
-
 
     //个人中心——获得评论自己的消息
     public function getCommentMessage()
@@ -217,6 +219,8 @@ class UserController extends Controller
             return ReturnHelper::returnWithStatus('未找到该记录',5001);
         }
 
+        $like_message->has_read = 1;
+
         try{
             $like_message->save();
         }catch (\Exception $e){
@@ -226,5 +230,64 @@ class UserController extends Controller
         return ReturnHelper::returnWithStatus();
 
     }
+
+    //个人中心——获取系统信息列表
+    public function getSystemMessage()
+    {
+        $user = session('user');
+
+        //找到在text表中发布但没添加到control表中的系统消息
+        $message_texts = SystemMessageText::UserGroup($user->user_group)->get();
+        $message_text_ids = array_map(function($message_text){return $message_text->id;},$message_texts);
+        $message_controls = SystemMessageControl::Ids($message_text_ids)->get();
+        $message_control_message_ids = array_map(function($message_control){return $message_control->message_id;},$message_controls);
+        //如果有上述消息，就创建新的SystemMessageControl
+        $not_added = array_diff($message_text_ids,$message_control_message_ids);
+        foreach ($not_added as $message_id){
+            $message_control = new SystemMessageControl();
+            $message_control->user_id = $user->id;
+            $message_control->message_id = $message_id;
+            $message_control->save();
+            $message_controls[] = $message_control;
+        }
+
+        //返回SystemMessage
+        $messages = [];
+        $i = 0;
+        foreach ($message_controls as $message_control){
+            $message_text = SystemMessageText::find($message_control->message_id);
+            $messages[$i] = [
+                'id' => $message_control->id,
+                'title' => $message_text->title,
+                'body' => $message_text->body,
+                'created_at' => Carbon::parse($message_text->created_at)->format("Y-m-d h:i:s"),
+                'has_read' => $message_control->has_read,
+            ];
+        }
+
+        return ReturnHelper::returnWithStatus($messages);
+
+
+
+
+
+    }
     
+    //个人中心——将系统信息标为已读
+    public function readSystemMessage($id)
+    {
+        $message = SystemMessageControl::find($id);
+        if($message === null){
+            return ReturnHelper::returnWithStatus('未找到该记录',5001);
+        }
+        $message->has_read = 1;
+        try{
+            $message->save();
+        }catch (\Exception $e){
+            return ReturnHelper::returnWithStatus('标记已读失败',5002);
+        }
+        return ReturnHelper::returnWithStatus();
+    }
+
 }
+

@@ -24,15 +24,26 @@ Route::prefix('users')->namespace('WebApi')->group(function(){
     Route::post('/','UserController@create');
     Route::patch('/','UserController@update')->middleware('auth');
     Route::delete('/','UserController@destroy')->middleware('auth');
+
     Route::post('/info','UserController@getSelfInfo')->middleware('auth');
     Route::get('/{username}/info','UserController@getInfo');
-    Route::post('/publish','UserController@getPublished')->middleware('auth');
+});
 
-    Route::post('/messages/comments','UserController@getCommentMessage')->middleware('auth');
-    Route::post('/messages/comments/{id}','UserController@readCommentMessage')->middleware('auth');
+/**
+ * 个人中心
+ */
+Route::prefix('users')->middleware('auth')->namespace('WebApi')->group(function (){
+    Route::post('/publish','UserController@getPublished');
 
-    Route::post('/messages/likes','UserController@getLikeMessage')->middleware('auth');
-    Route::post('/messages/likes/{id}','UserController@readLikeMessage')->middleware('auth');
+    Route::post('/messages/comments','UserController@getCommentMessage');
+    Route::post('/messages/comments/{id}','UserController@readCommentMessage');
+
+    Route::post('/messages/likes','UserController@getLikeMessage');
+    Route::post('/messages/likes/{id}','UserController@readLikeMessage');
+
+    Route::post('/messages/system','UserController@getSystemMessage');
+    Route::post('/messages/system/{id}','UserController@readSystemMessage');
+
 });
 
 /**
@@ -74,5 +85,11 @@ Route::middleware('auth')->prefix('likes')->namespace('WebApi')->group(function 
  * 收藏
  */
 Route::post('/favorites/posts/{post}','WebApi\\FavoriteController@favoritePost')->middleware('auth');
+
+/**
+ * 管理员
+ */
+Route::post('/admin/message','WebApi\\AdminController@createSystemMessage')->middleware('auth');
+
 
 

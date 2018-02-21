@@ -17,24 +17,26 @@
 ```html
 GET {{webserver}}/login
 ```
+* 登陆成功返回access_token、token_id、state。  
+token_id和access_token需要储存至cookie,state表示是由哪个页面跳转至此，可供前端执行redirect命令。
 
-```html
-{
-    "data": {
-        "access_token": "eyJpdiI6ImF0RGJhMFBSUWhGK1Baa3R5WENTdkE9PSIsInZhbHVlIjoiWGZmSWxqWGhGcGRUM3VsNVlaUnNDWlVNTmh2aFkzbEIyQm5laVlEb2JNMUVtWDJuQmJzZzZ2MzBqa1J0dG92QjBFZG16a25OZDhYUFhvN3MzVVRaVk9SOGQ5Rm9QT2RQQmlTVXMrRFppcU9oVzN2YmVhalpIXC9RZGdtb3VsOXZFdWRVeTVXVzhjVFNUeEZZRFYyTHJpbnpqK2EzbUp3NjJvNmhWOE02RFYwbnA3WWx5RHdWMnpZM1ppejN3dWU2dHZoMUtVQU1KQm9QaW16NTVNRlUxU2FDZVFnanFEQlFYd05Qd043YndCa1RMZUkxMU5iVDh5aVdTT1pQQllFS3dIWFJOaWI1QUhHQ1JYZnZNUVhwekY3SExsd0ljdzhRSGFHRzBGVkRRR05CNFVpYUJRV0FXZEFsYzV5TFVsU3ZCNHc0RDRcL2JQMUxnZzE0aFJncHRmc3ZlNVZ0NWR4V1dKVzdzTlRYbFVJb3A1UnpTR01Tam5CWXpPckhhUFhOdmF2QmowTTJhdFd1MWQwanQ5NEp1YStaaDJzMGpyWVZteVlWRXJ2SUM4enBkUjU5QzlmVUdBTEhUaDBUbmlqN2k3aFVTakl2YmVJalJDVW41T0hySHZMc3JVVGYwYlR3OER1d0ZiUkhjcDZTUmdMVURNZkNwcW5LYUthZzlQVEVvcDV3UUNHWDN6cXZ6WmY2U040ek01WEpGYzFGY1FMUGM2NytOOFhEb21weDZhN0MzRU5cL3lsemVEOHVoSVRNVnYyZk5jMEVhQUdiRU81Qk51NnhsNnR4Y1YxK0Z3eFkzNXQ0ZGpZM0w2UDYzWGVzcXZ1QW9waDA0OFRUSDNHUDZHelcrNjhzUEl0N3UwR0Z1UDNMc3RRUkVZXC95ZVlOdDlaVVEwT1I3Nmd5ODltZ0V0Q0R3ejNCbFU0cmtIU2N6SFFhdnZVTE5idGpKXC9nZ0IzbXJ4RVM5WjMreXp4cTVTOFdPdEJcL3lkRVpTTXZTU3llT05lZ2pMNXdzbDFZS0lkT3RhQUhKM3RvYmN0R2pxMGU3VWFvZlZmMlJPUW5xY3BiV2ZnU2lNR2J3Q2NKV3F5dXg5QWprNmNKclJNbjIzbDNrMDdhYW9NTytUcHJORlAzS25KY2RFV1NTalZmaG9lN0NzYU5UUHVPWXhLWHltM2puQ3gzNVwvQ3Jqd1RPbTV0bUJHS3R5YURcL2dQUVpXanlDRkJuWjNxemxEN2xVaEk5V2xoS29EMnhjdzdsZldWeFFMcjUxZGFBZmlyMzByd2FsU2Z6SWJSUkVJdFFYRE1JWHhObTVTeG1jM0RUdGpFZUZ0T0Z3MkFvQ3IxR0hYUyt2MmVtWE1KV29cL0hVTnF1WG1JUVlTTng5cnlcL0xodFd6RWY3bVJXZG9IQmV1TkZtT2NPdjJGWE1nZ01hZyt3ZWprWG9ZSDY3QlwvK1greExWdW13SDl2ZFRKZzVLYURIQzFXMlwvNVNLMkFqUk9JRnp1MXRkYjhtcXNvSEFXaHBDRUNQZGRMaTB3TEJpOTNTUXBLNGNpYnpaYUJqZlBvdXk4ejhJblpmME53d29GOWRzVmNIMlliaE5ocW4yTlZVcVB3aFE3cEszZGc2QUZEZzFVYWt5UGpiUEg5SE1KNmc5ZTlTWXN4MHR1Unh1THRwVnlNK3RWVVFER1J2UlwvZFdVWSs4VHJNNFFXbklpcE9jaUZ1RGVZc2wrd2k4NTROTmRKbjhJUjhnR01TcTZoc1U2OXFxWXllUE9PczlOUGh3Zmk0YjFYNE94MWpCUTVwUEx2T3pLaVhVUUhocEM2Z3crRzdVWXBYSGQ5UEFaZTlBcElOSmNvT1ZcLzVQVlpPc0wxRzVWZTlMZ3FLNnlYaDlLWVJ0Y1d3SnV0cFlzTVJtZUI0OFhJM0p1cDR0dHRcLzg0dFpcL0wzWFFwZExpNHhRYWh1Z1BvcTlxNGNjS2l4WXFVT2FDRGEzNFF5UnlrbVBLSkw5ZGdsRDN4clMyS0VhWWI2RUVmcjIwZEdMZEY1RXdUbENpSlZHdHpENUYwV2hIRTFJbGNRWWYzQzlBeSt1VjBCc2g5OVJ5blwvejlnPT0iLCJtYWMiOiI4YzM0OWEyMTg5MWM3OWM4ZjdiNTkyYzI0Y2VhZTgzMTVlMDRlMGI4ZmE5NTQ5ZDY0N2QzNTBjYTlkNTlkZjE1In0=",
-        "token_id": 1,
-        "state": "http://workshop.test/login"
-    },
-    "code": 200
-}
-```
-登录失败时返回40X
-```
-{
-    "data": "Invalid state",
-    "code": 401
-}
-```
+    ```json
+    {
+        "data": {
+            "access_token": "",
+            "token_id": 1,
+            "state": "http://workshop.test/login"
+        },
+        "code": 200
+    }
+    ```
+* 登录失败时返回40X
+    ```
+    {
+        "data": "Invalid state",
+        "code": 401
+    }
+    ```
 
 ## 登出
 ```html
@@ -51,24 +53,147 @@ GET {{webserver}}/logout
 ```html
 POST {{server}}/users
 
-token_id 由登陆接口返回的token_id
-access_token 由登陆接口返回的access_token
-nickname 昵称
-signature 个性签名
-email
-email_access 邮箱是否公开，1表示公开，0表示不公开
-phone
-phone_access
-qq
-qq_access
+    token_id
+    access_token
+    nickname 必需，昵称
+    signature 非必需，个性签名
+    email 非必需
+    email_access 非必需，邮箱是否公开，1表示公开，0表示不公开
+    phone 非必需
+    phone_access 非必需
+    qq 非必需
+    qq_access 非必需
 ```
 
-成功返回用户信息，失败返回如下
+* 成功返回用户信息，
+    ```json
+    {
+        "data": {
+            "id": 1,
+            "username": "cantjie",
+            "nickname": "Cantjie",
+            "signature": "个性签名",
+            "head_img": null,
+            "email": "cantjie@163.com",
+            "phone": null,
+            "qq": null,
+            "email_access": null,
+            "phone_access": null,
+            "qq_access": null
+        },
+        "code": 200
+    }
+    ```
+
+* 失败返回如下
+    ```json
+    {
+        "data": {
+            "errors": "注册失败"
+        },
+        "code": 1004
+    }
+    ```
+## 完善用户信息
+
 ```html
-{
-    "data": {
-        "errors": "注册失败"
-    },
-    "code": 1004
-}
+PATCH {{server}}/users
+    
+    所需参数与注册新用户一致
+```  
+* 成功返回用户信息
+
+    ```json
+    {
+        "data": {
+            "id": 1,
+            "username": "cantjie",
+            "nickname": "cantjie",
+            "signature": "个性签名",
+            "head_img": null,
+            "email": "cantjie@163.com",
+            "phone": null,
+            "qq": "46472001",
+            "email_access": "1",
+            "phone_access": "0",
+            "qq_access": "0"
+        },
+        "code": 200
+    }
+    ```
+## 获取当前用户信息
+```html
+POST {{server}}/users/info
+
+    token_id
+    access_token
+```    
+* 成功返回用户信息
+    ```json
+    {
+        "data": {
+            "id": 1,
+            "username": "cantjie",
+            "nickname": "cantjie",
+            "signature": "个性签名",
+            "head_img": null,
+            "email": "cantjie@163.com",
+            "phone": null,
+            "qq": "46472001",
+            "email_access": 1,
+            "phone_access": 0,
+            "qq_access": 0
+        },
+        "code": 200
+    }
+    ```
+## 注销用户
+```html
+DELETE {{server}}/users
+    
+    access_token
+    token_id
 ```
+* 成功返回200+空内容
+    ```json
+    {
+        "data":{},
+        "code":200  
+    }
+    ```
+
+## 获取某用户信息
+```html
+GET {{server}}/users/{username}/info
+```
+* 成功则返回用户允许可见的信息
+    ```json
+    {
+        "data": {
+            "id": 1,
+            "username": "cantjie",
+            "nickname": "cantjie",
+            "head_img": null,
+            "signature": "个性签名",
+            "email": "cantjie@163.com"
+        },
+        "code": 200
+    }
+    ```
+
+## 个人中心——我的发布
+```html
+POST {{server}}/users/publish
+    
+    token_id
+    access_token
+```
+* 成功则返回发布过的文章
+
+    ```json
+    {
+        "data": [],
+        "code": 200
+    }
+    ```
+

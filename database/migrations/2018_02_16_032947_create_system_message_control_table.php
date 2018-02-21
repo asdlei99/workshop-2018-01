@@ -16,6 +16,7 @@ class CreateSystemMessageControlTable extends Migration
         Schema::create('system_message_control', function (Blueprint $table) {
             $table->increments('id');
             $table->integer('user_id')->unsigned();
+            $table->integer('message_id')->unsigned();
             $table->boolean('has_read')->default(0)->comment('是否已读');
             $table->timestamps();
         });
