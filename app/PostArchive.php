@@ -11,5 +11,9 @@ class PostArchive extends Model
     protected $table = 'post_archive';
     protected $dates = ['deleted_at'];
 
+    public static function findByPostId($post_id)
+    {
+        return static::where('post_id',$post_id)->first();
+    }
     
 }

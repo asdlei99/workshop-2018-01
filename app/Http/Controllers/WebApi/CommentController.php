@@ -71,7 +71,7 @@ class CommentController extends Controller
         $post_popularity = $parent_comment->getPost()->getPopularity();
         $post_popularity->comment_count = $post_popularity->comment_count + 1;
 
-        $parent_comment_popularity = $parent_comment->getPopularity();
+        $parent_comment_popularity = $parent_comment->getFirstLevelParent()->getPopularity();
         $parent_comment_popularity->comment_count = $parent_comment_popularity->comment_count + 1;
 
         $comment = new Comment();
@@ -107,7 +107,7 @@ class CommentController extends Controller
             return ReturnHelper::returnWithStatus('未找到指定评论',3002);
         }
 
-        if(session('user')->id !== $comment->id){
+        if(session('user')->id !== $comment->user_id){
             return ReturnHelper::returnWithStatus('您没有权限删除该评论',3003);
         }
 

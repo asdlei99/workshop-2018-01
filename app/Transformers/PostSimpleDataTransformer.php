@@ -2,15 +2,15 @@
 
 namespace App\Transformers;
 
+use App\Post;
 use Illuminate\Support\Carbon;
 use League\Fractal;
 use League\Fractal\TransformerAbstract;
 use League\Fractal\Resource\Collection;
 use League\Fractal\Resource\Item;
-use App\Post;
 
 
-class PostTransformer extends TransformerAbstract
+class PostSimpleDataTransformer extends TransformerAbstract
 {
     /**
      * List of resources possible to include
@@ -27,7 +27,7 @@ class PostTransformer extends TransformerAbstract
     protected $defaultIncludes = ['archive','user','popularity'];
 
     /**
-     * Transform object into a generic array
+     * 与PostTransformer的区别除了body和created_at字段，
      *
      * @var $resource
      * @return array
@@ -38,10 +38,9 @@ class PostTransformer extends TransformerAbstract
             'id' => $post->id,
             'title' => $post->title,
             'description' => $post->description,
-            'body' => $post->body,
             'anonymous' => $post->anoymous,
             'views' => $post->views,
-            'created_at' => Carbon::parse($post->created_at)->format("Y-m-d h:i:s") ,
+//            'created_at' => Carbon::parse($post->created_at)->format("Y-m-d h:i:s") ,
             'updated_at' => Carbon::parse($post->updated_at)->format("Y-m-d h:i:s") ,
         ];
     }

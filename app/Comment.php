@@ -68,4 +68,17 @@ class Comment extends Model
         return $this->belongsTo(User::class,'user_id','id')->getResults();
     }
 
+    public function getParentOrSelf()
+    {
+        if($this->parent_id === 0){
+            return $this;
+        }else{
+            return Comment::where('id',$this->parent_id)->first();
+        }
+    }
+    public function getFirstLevelParent()
+    {
+        return $this->getParentOrSelf()->getParentOrSelf();
+    }
+
 }

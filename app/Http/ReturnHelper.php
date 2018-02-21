@@ -59,18 +59,34 @@ class ReturnHelper
      * @param string $status
      * @return array
      */
-    public static function returnWithStatus($data = null, $code = 200)
+    public static function returnWithStatus($data = null, $code = 200, $paginator = null)
     {
+        $to_return = ['code'=>$code];
         if(is_a($data,'\Cyvelnet\Laravel5Fractal\Adapters\ScopeDataAdapter')){
-            return [
-                'data' => json_decode($data->toJSON(),true),
-                'code' => $code,
-            ];
+            $to_return['data'] = json_decode($data->toJSON(),true);
+        }
+        else{
+            $to_return['data'] = $data;
         }
 
-        return [
-            'data' => $data,
-            'code' => $code,
-        ];
+
+        if(null !== $paginator){
+
+            $page_info = $paginator->toArray();
+            unset($page_info['data']);
+
+            $to_return = array_merge($to_return,$page_info);
+
+            //由于paginator中提供的url中会将原url中的get方法的参数删掉，因此在这里加上，
+            $to_return['first_page_url'] .= ('&cnt='.$to_return['per_page']);
+            if($to_return['next_page_url'] !== null){
+                $to_return['next_page_url'] .= ('&cnt='.$to_return['per_page']);
+            }
+            if($to_return['prev_page_url'] !== null){
+                $to_return['prev_page_url'] .= ('&cnt='.$to_return['per_page']);
+            }
+        }
+
+        return $to_return;
     }
 }
