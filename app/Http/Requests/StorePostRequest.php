@@ -44,17 +44,12 @@ class StorePostRequest extends FormRequest
             'description.max' => '描述长度不可超过255',
         ];
     }
-    
+
     protected function failedValidation(Validator $validator)
     {
-        $errors = $validator->errors()->toArray();
-        $expected_errors_array = [];
-        foreach ($errors as $error) {
-            $expected_errors_array['errors'][] = $error;
-        }
         exit(json_encode(ReturnHelper::returnWithStatus(
-            $expected_errors_array,
-            2001
+            $validator->errors()->toArray(),
+            6002
         )));
     }
 

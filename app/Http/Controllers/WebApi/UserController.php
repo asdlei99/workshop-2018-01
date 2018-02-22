@@ -141,19 +141,29 @@ class UserController extends Controller
 
 
     //个人中心——获取已发布文章列表
-    public function getPublished()
+    public function getPublished(Request $request)
     {
+        $cnt = $request->input('cnt',15);
         $user = session('user');
-//        $published = $user->getPosts();
-        $published = $user->posts()->simplePaginate();
-        return ReturnHelper::returnWithStatus(Fractal::collection($published,new PostTransformer()));
+        $paginator = $user->posts()->orderBy('id','desc')->simplePaginate($cnt);
+        $published = $paginator->getCollection();
+        return ReturnHelper::returnWithStatus(Fractal::collection($published,new PostTransformer()),200,$paginator);
     }
 
     //个人中心——获得评论自己的消息
-    public function getCommentMessage()
+    public function getCommentMessage(Request $request)
     {
-        $messages = CommentMessageControl::getByUserId(session('user'));
-        return ReturnHelper::returnWithStatus(Fractal::collection($messages,new MessageControlTransformer()));
+        $cnt = $request->input('cnt',15);
+
+        $paginator = CommentMessageControl::userId(session('user'))->orderBy('id','desc')->simplepaginate($cnt);
+        $messages = $paginator->getCollection();
+
+//        $messages = CommentMessageControl::getByUserId(session('user'));
+        return ReturnHelper::returnWithStatus(
+            Fractal::includes('comment')->collection($messages,new MessageControlTransformer()),
+            200,
+            $paginator
+        );
     }
     
     //个人中心——将评论自己的消息标记为已读
@@ -173,11 +183,12 @@ class UserController extends Controller
     }
 
     //个人中心——获得给自己点的赞
-    public function getLikeMessage()
+    public function getLikeMessage(Request $request)
     {
+        //todo 不知如何实现分页功能
         $user_id = session('user')->id;
-        $comment_likes = CommentLikeMessageControl::getByUserId($user_id);
-        $post_likes = PostLikeMessageControl::getByUserId($user_id);
+        $comment_likes = CommentLikeMessageControl::userId($user_id)->orderBy('id','desc')->get();
+        $post_likes = PostLikeMessageControl::userId($user_id)->orderBy('id','desc')->get();
 
         $j = count($comment_likes)- 1;
         $k = count($post_likes) - 1;
@@ -206,7 +217,7 @@ class UserController extends Controller
     }
 
     //个人中心——将给自己点赞的消息标记为已读
-    public function readLikeMessage($request, $id)
+    public function readLikeMessage(Request $request, $id)
     {
         $like_type = $request->input('like_type','comment');
         if($like_type === 'comment'){
@@ -237,10 +248,11 @@ class UserController extends Controller
         $user = session('user');
 
         //找到在text表中发布但没添加到control表中的系统消息
-        $message_texts = SystemMessageText::UserGroup($user->user_group)->get();
+        $message_texts = SystemMessageText::UserGroup($user->user_group)->get()->toArray();
         $message_text_ids = array_map(function($message_text){return $message_text->id;},$message_texts);
-        $message_controls = SystemMessageControl::Ids($message_text_ids)->get();
+        $message_controls = SystemMessageControl::Ids($message_text_ids)->get()->toArray();
         $message_control_message_ids = array_map(function($message_control){return $message_control->message_id;},$message_controls);
+
         //如果有上述消息，就创建新的SystemMessageControl
         $not_added = array_diff($message_text_ids,$message_control_message_ids);
         foreach ($not_added as $message_id){
@@ -289,5 +301,36 @@ class UserController extends Controller
         return ReturnHelper::returnWithStatus();
     }
 
+
+    //个人中心——获得 自己的文章收到的赞的消息
+    public function getPostLikeMessage(Request $request)
+    {
+        $cnt = $request->input('cnt',15);
+
+        $paginator = PostLikeMessageControl::userId(session('user'))->orderBy('id','desc')->simplePaginate($cnt);
+        $post_like_messages = $paginator->getCollection();
+
+        return ReturnHelper::returnWithStatus(
+            Fractal::includes('post')->collection($post_like_messages,new MessageControlTransformer()),
+            200,
+            $paginator
+        );
+    }
+
+    //个人中心——获得 自己的评论收到的赞的消息
+    public function getCommentLikeMessage(Request $request)
+    {
+        $cnt = $request->input('cnt',15);
+
+        $paginator = CommentLikeMessageControl::userId(session('user'))->orderBy('id','desc')->simplePaginate($cnt);
+        $comment_like_messages = $paginator->getCollection();
+
+        return ReturnHelper::returnWithStatus(
+            Fractal::includes('comment')->collection($comment_like_messages,new MessageControlTransformer()),
+            200,
+            $paginator
+        );
+
+    }
 }
 

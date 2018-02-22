@@ -13,6 +13,7 @@ use App\Transformers\CommentTransformer;
 use Carbon\Carbon;
 use App\Http\Controllers\Controller;
 use Cyvelnet\Laravel5Fractal\Facades\Fractal;
+use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use function Sodium\crypto_box_publickey_from_secretkey;
 
@@ -101,12 +102,10 @@ class CommentController extends Controller
 
     public function destroy($id)
     {
-        //todo 删除的时候CommentMessageControl要不要删除? 目前没删除
         $comment = Comment::find($id);
         if(null === $comment){
             return ReturnHelper::returnWithStatus('未找到指定评论',3002);
         }
-
         if(session('user')->id !== $comment->user_id){
             return ReturnHelper::returnWithStatus('您没有权限删除该评论',3003);
         }
@@ -116,11 +115,18 @@ class CommentController extends Controller
         }
 
         $post_popularity = $comment->getPost()->getPopularity();
+
+        $comment_message = CommentMessageControl::findByCommentId($id);
+
         try{
             $cnt = $comment->deleteSelfAndChildren();
+
             $post_popularity->comment_count = $post_popularity->comment_count - $cnt;
             $post_popularity->save();
+
             isset($comment_popularity)? $comment_popularity->delete():false;
+            $comment_message->delete();
+
         }catch (\Exception $e){
             return ReturnHelper::returnWithStatus('删除评论失败',3001);
         }
@@ -128,11 +134,23 @@ class CommentController extends Controller
         return ReturnHelper::returnWithStatus('删除评论成功');
     }
 
-    public function getPostComments($post_id)
+    public function getPostComments(Request $request, $post_id)
     {
         $post = Post::find($post_id);
-        $comments = $post->getComments();
-        return ReturnHelper::returnWithStatus(Fractal::collection($comments, new CommentTransformer()));
+        if($post === null ){
+            return ReturnHelper::returnWithStatus('未找到指定文章',2003);
+        }
+
+        $cnt = $request->input('cnt',15);
+
+        $paginator = $post->comments()->orderBy('id', 'desc')->simplePaginate($cnt);
+        $comments = $paginator->getCollection();
+
+        return ReturnHelper::returnWithStatus(
+            Fractal::collection($comments, new CommentTransformer()),
+            200,
+            $paginator
+        );
     }
 
 }

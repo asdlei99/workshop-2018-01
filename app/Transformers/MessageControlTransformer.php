@@ -39,7 +39,7 @@ class MessageControlTransformer extends TransformerAbstract
         $data = [
             'id' => $resource->id,
             'has_read' => $resource->has_read,
-            'date' => Carbon::parse($resource->created_at)->format("Y-m-d h:i:s"),
+            'created_at' => Carbon::parse($resource->created_at)->format("Y-m-d h:i:s"),
         ];
 
         if(is_a($resource,CommentMessageControl::class)){
@@ -52,5 +52,28 @@ class MessageControlTransformer extends TransformerAbstract
             $data['comment_like_id'] = $resource->like_id;
         }
         return $data;
+    }
+
+    public function includeComment($resource)
+    {
+        return $this->item($resource->getComment(),function($comment){
+            return [
+                'id' => $comment->id,
+                'body' => $comment->body,
+            ];
+        });
+    }
+
+    public function includePost($resource)
+    {
+        if(is_a($resource,PostLikeMessageControl::class)){
+            return $this->item($resource->getPost(),function($post){
+                return [
+                    'id' => $post->id,
+                    'title' => $post->title,
+                    'description' => $post->description,
+                ];
+            });
+        }
     }
 }

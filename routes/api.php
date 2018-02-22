@@ -19,7 +19,7 @@ use Illuminate\Http\Request;
 
 /**
  * 用户
-*/
+ */
 Route::prefix('users')->namespace('WebApi')->group(function(){
     Route::post('/','UserController@create');
     Route::patch('/','UserController@update')->middleware('auth');
@@ -36,13 +36,16 @@ Route::prefix('users')->middleware('auth')->namespace('WebApi')->group(function 
     Route::post('/publish','UserController@getPublished');
 
     Route::post('/messages/comments','UserController@getCommentMessage');
-    Route::post('/messages/comments/{id}','UserController@readCommentMessage');
+    Route::patch('/messages/comments/{id}','UserController@readCommentMessage');
 
     Route::post('/messages/likes','UserController@getLikeMessage');
-    Route::post('/messages/likes/{id}','UserController@readLikeMessage');
+    Route::post('/messages/likes/comments','UserController@getCommentLikeMessage');
+    Route::post('/messages/likes/posts','UserController@getPostLikeMessage');
+    Route::patch('/messages/likes/{id}','UserController@readLikeMessage');
+
 
     Route::post('/messages/system','UserController@getSystemMessage');
-    Route::post('/messages/system/{id}','UserController@readSystemMessage');
+    Route::patch('/messages/system/{id}','UserController@readSystemMessage');
 
 });
 

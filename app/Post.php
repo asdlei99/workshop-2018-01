@@ -9,6 +9,12 @@ class Post extends Model
 {
     use SoftDeletes;
     protected $dates = ['deleted_at'];
+
+    public function comments()
+    {
+        return $this->hasMany(Comment::class,'post_id','id');
+    }
+    
     public function getUser()
     {
         return $this->belongsTo(User::class,'user_id','id')->getResults();

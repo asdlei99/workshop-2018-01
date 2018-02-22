@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Contracts\Validation\Validator;
 
 class AddComment extends FormRequest
 {
@@ -33,5 +34,13 @@ class AddComment extends FormRequest
         return [
             'body.required' => '评论正文不能为空',
         ];
+    }
+
+    protected function failedValidation(Validator $validator)
+    {
+        exit(json_encode(ReturnHelper::returnWithStatus(
+            $validator->errors()->toArray(),
+            6002
+        )));
     }
 }

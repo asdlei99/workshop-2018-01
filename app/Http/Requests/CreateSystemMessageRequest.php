@@ -3,6 +3,8 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use App\Http\ReturnHelper;
+use Illuminate\Contracts\Validation\Validator;
 
 class CreateSystemMessageRequest extends FormRequest
 {
@@ -40,13 +42,8 @@ class CreateSystemMessageRequest extends FormRequest
 
     protected function failedValidation(Validator $validator)
     {
-        $errors = $validator->errors()->toArray();
-        $expected_errors_array = [];
-        foreach ($errors as $error) {
-            $expected_errors_array['errors'][] = $error;
-        }
         exit(json_encode(ReturnHelper::returnWithStatus(
-            $expected_errors_array,
+            $validator->errors()->toArray(),
             6002
         )));
     }

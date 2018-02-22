@@ -91,3 +91,70 @@ DELETE {{server}}/comments/{comment_id}
     ```
     
 ## 获取文章评论
+```html
+GET {{server}}/posts/{post_id}/comments
+    
+    cnt
+    page
+```
+
+* 成功后返回评论列表
+    ```json
+    {
+        "code": 200,
+        "data": [
+            {
+                "id": 10,
+                "post_id": 1,
+                "user_id": 1,
+                "parent_id": 0,
+                "level": 1,
+                "body": "第三条评论",
+                "created_at": "2018-02-21 02:18:28",
+                "user": {
+                    "id": 1,
+                    "username": "cantjie",
+                    "nickname": "cantjie",
+                    "head_img": null,
+                    "signature": "个性签名",
+                    "email": "cantjie@163.com"
+                },
+                "popularity": {
+                    "favorite_count": 0,
+                    "comment_count": 0,
+                    "like_count": 0
+                }
+            },
+            {
+                "id": 9,
+                "post_id": 1,
+                "user_id": 1,
+                "parent_id": 0,
+                "level": 1,
+                "body": "第四条评论",
+                "created_at": "2018-02-21 02:15:31",
+                "user": {
+                    "id": 1,
+                    "username": "cantjie",
+                    "nickname": "cantjie",
+                    "head_img": null,
+                    "signature": "个性签名",
+                    "email": "cantjie@163.com"
+                },
+                "popularity": {
+                    "favorite_count": 0,
+                    "comment_count": 0,
+                    "like_count": 0
+                }
+            }
+        ],
+        "current_page": 1,
+        "first_page_url": "http://workshop.test/api/posts/1/comments?page=1&cnt=15",
+        "from": 1,
+        "next_page_url": null,
+        "path": "http://workshop.test/api/posts/1/comments",
+        "per_page": 15,
+        "prev_page_url": null,
+        "to": 2
+    }
+    ```
