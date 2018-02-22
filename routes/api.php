@@ -81,5 +81,12 @@ Route::post('/favorites/posts/{post}','WebApi\\FavoriteController@favoritePost')
  */
 Route::post('/admin/message','WebApi\\AdminController@createSystemMessage')->middleware('auth');
 
+/**
+ * 搜索
+ */
+Route::namespace('WebApi')->group(function(){
+    Route::get('search/u','SearchController@searchUser');
+    Route::get('search/p','SearchController@searchPost');
+});
 
 
