@@ -2,21 +2,6 @@
 
 use Illuminate\Http\Request;
 
-/*
-|--------------------------------------------------------------------------
-| API Routes
-|--------------------------------------------------------------------------
-|
-| Here is where you can register API routes for your application. These
-| routes are loaded by the RouteServiceProvider within a group which
-| is assigned the "api" middleware group. Enjoy building your API!
-|
-*/
-
-//Route::middleware('auth:api')->get('/user', function (Request $request) {
-//    return $request->user();
-//});
-
 /**
  * 用户
  */
@@ -24,15 +9,18 @@ Route::prefix('users')->namespace('WebApi')->group(function(){
     Route::post('/','UserController@create');
     Route::patch('/','UserController@update')->middleware('auth');
     Route::delete('/','UserController@destroy')->middleware('auth');
+    Route::post('/avatar','UserController@uploadAvatar')->middleware('auth');
 
     Route::post('/info','UserController@getSelfInfo')->middleware('auth');
     Route::get('/{username}/info','UserController@getInfo');
+
 });
 
 /**
  * 个人中心
  */
 Route::prefix('users')->middleware('auth')->namespace('WebApi')->group(function (){
+    Route::post('/favorite','UserController@getFavoritedPost');
     Route::post('/publish','UserController@getPublished');
 
     Route::post('/messages/comments','UserController@getCommentMessage');
@@ -46,7 +34,6 @@ Route::prefix('users')->middleware('auth')->namespace('WebApi')->group(function 
 
     Route::post('/messages/system','UserController@getSystemMessage');
     Route::patch('/messages/system/{id}','UserController@readSystemMessage');
-
 });
 
 /**
@@ -65,7 +52,7 @@ Route::prefix('posts')->namespace('WebApi')->group(function() {
  * 文章类别
  */
 Route::get('/archives/{archive}','WebApi\\PostController@showByArchive');
-Route::get('/archives','WebApi\\archiveController@show');
+Route::get('/archives','WebApi\\ArchiveController@show');
 
 /**
  * 评论

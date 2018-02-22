@@ -4,13 +4,17 @@ namespace App\Http\Controllers\WebApi;
 
 use App\CommentLikeMessageControl;
 use App\CommentMessageControl;
+use App\Favorite;
 use App\Http\Requests\CreateUser;
+use App\Http\Requests\uploadAvatarRequest;
 use App\Http\ReturnHelper;
+use App\Post;
 use App\PostLikeMessageControl;
 use App\Providers\EventServiceProvider;
 use App\SystemMessageControl;
 use App\SystemMessageText;
 use App\Transformers\MessageControlTransformer;
+use App\Transformers\PostSimpleDataTransformer;
 use App\Transformers\PostTransformer;
 use App\Transformers\UserOtherTransformer;
 use App\Transformers\UserSelfTransformer;
@@ -19,8 +23,10 @@ use App\Http\Controllers\Controller;
 use App\User;
 use Carbon\Carbon;
 use Cyvelnet\Laravel5Fractal\Facades\Fractal;
+use Illuminate\Contracts\Cache\Store;
 use Illuminate\Http\Request;
 use App\OAuth2Token;
+use Illuminate\Support\Facades\Storage;
 
 class UserController extends Controller
 {
@@ -106,6 +112,31 @@ class UserController extends Controller
         }catch (\Exception $e){
 //            return $e->getMessage();
             return ReturnHelper::returnWithStatus(['errors'=>'修改失败'],1004,'修改用户信息失败');
+        }
+
+        return ReturnHelper::returnWithStatus(Fractal::item($user,new UserSelfTransformer()));
+    }
+
+    public function uploadAvatar(uploadAvatarRequest $request)
+    {
+        //todo 上传图片这里在不同操作系统可能会出现问题
+        $user = session('user');
+
+        $path = $request->head_img->store('avatars');
+        $path = '/storage/'.$path;
+
+        $old_path = $user->head_img;
+        if($old_path !== null){
+            $old_path = substr($old_path,9);
+            Storage::delete($old_path);
+        }
+
+        $user->head_img = $path;
+
+        try{
+            $user->save();
+        }catch (\Exception $e){
+            return $e->getMessage();
         }
 
         return ReturnHelper::returnWithStatus(Fractal::item($user,new UserSelfTransformer()));
@@ -331,6 +362,24 @@ class UserController extends Controller
             $paginator
         );
 
+    }
+    
+    //个人中心——我的收藏
+    public function getFavoritedPost(Request $request)
+    {
+        $cnt = $request->input('cnt',15);
+
+        $user = session('user');
+
+        $post_ids = Favorite::userId($user)->pluck('post_id')->toArray();
+        $paginator = Post::postIds($post_ids)->orderBy('id','desc')->simplePaginate();
+        $posts = $paginator->getCollection();
+
+        return ReturnHelper::returnWithStatus(
+            Fractal::collection($posts, new PostSimpleDataTransformer()),
+            200,
+            $paginator
+        );
     }
 }
 

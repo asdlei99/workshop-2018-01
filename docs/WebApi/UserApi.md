@@ -3,10 +3,12 @@
 * 登出
 * 注册新用户
 * 获取当前用户信息
-* 完善用户信息
+* 完善用户信息(不包含头像)
+* 上传头像
 * 注销用户
 * 获取某用户信息
-* 我的发布
+* 个人中心-我的发布
+* 个人中心-我的收藏
 * 个人中心-我收到的回复
 * 个人中心-将收到的回复标为已读
 * 个人中心-我收到的赞(不推荐)
@@ -98,7 +100,7 @@ POST {{server}}/users
         "code": 1004
     }
     ```
-## 完善用户信息
+## 完善用户信息(不包含头像)
 
 ```html
 PATCH {{server}}/users
@@ -151,6 +153,34 @@ POST {{server}}/users/info
         "code": 200
     }
     ```
+## 上传头像
+```html
+POST {{server}}/users/avatar
+
+    token_id
+    access_token
+    head_img (图像文件，后端会验证是否为图片文件）
+```
+* 成功后返回用户信息
+    ```json
+    {
+        "code": 200,
+        "data": {
+            "id": 1,
+            "username": "cantjie",
+            "nickname": "cantjie",
+            "signature": "个性签名",
+            "head_img": "/storage/avatars/FFHPmbcZSrjhP2zOEGF56LZroLZmfpEgSvz6ko8H.jpeg",
+            "email": "cantjie@163.com",
+            "phone": null,
+            "qq": "46472001",
+            "email_access": 1,
+            "phone_access": 0,
+            "qq_access": 0
+        }
+    }
+    ```
+
 ## 注销用户
 ```html
 DELETE {{server}}/users
@@ -185,7 +215,7 @@ GET {{server}}/users/{username}/info
     }
     ```
 
-## 个人中心——我的发布
+## 个人中心-我的发布
 ```html
 POST {{server}}/users/publish
     
@@ -447,6 +477,63 @@ POST {{server}}/users/publish
     "per_page": 15,
     "prev_page_url": null,
     "to": 7
+    }
+    ```
+## 个人中心-我的收藏
+```html
+POST {{server}}/users/favorite
+    
+    token_id
+    access_token
+    cnt
+    page
+```
+* 成功后返回收藏的文章列表
+    ```json
+    {
+        "code": 200,
+        "data": [
+            {
+                "id": 1,
+                "title": "第一篇文章标题",
+                "description": "第一篇文章详情",
+                "anonymous": null,
+                "views": null,
+                "updated_at": "2018-02-21 07:19:57",
+                "archive": [
+                    {
+                        "description": "干货",
+                        "id": 1
+                    },
+                    {
+                        "description": "黑科技",
+                        "id": 2
+                    }
+                ],
+                "user": {
+                    "id": 1,
+                    "username": "cantjie",
+                    "nickname": "cantjie",
+                    "head_img": "/storage/avatars/FFHPmbcZSrjhP2zOEGF56LZroLZmfpEgSvz6ko8H.jpeg",
+                    "signature": "个性签名",
+                    "email": "cantjie@163.com"
+                },
+                "popularity": {
+                    "like_count": 1,
+                    "comment_count": 1,
+                    "favorite_count": 1,
+                    "view_count": 1
+                }
+            }
+        ],
+        "current_page": 1,
+        "first_page_url": "http://workshop.test/api/users/favorite?page=1&cnt=15",
+        "from": 1,
+        "next_page_url": null,
+        "path": "http://workshop.test/api/users/favorite",
+        "per_page": 15,
+        "prev_page_url": null,
+        "to": 1
     }
     ```
 

@@ -41,4 +41,9 @@ class Post extends Model
     {
         return PostPopularity::find($this->id);
     }
+
+    public function scopePostIds($query, $post_ids)
+    {
+        return $query->whereIn('id',$post_ids);
+    }
 }
