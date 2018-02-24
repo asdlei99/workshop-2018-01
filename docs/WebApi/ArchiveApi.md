@@ -13,16 +13,19 @@ GET {{server}}/archives
         "data": [
             {
                 "description": "干货",
-                "id": 1
+                "id": 1,
+                "parent_id": 0
             },
             {
                 "description": "黑科技",
-                "id": 2
+                "id": 2,
+                "parent_id": 1
             },
             {
                 "description": "教程",
-                "id": 3
+                "id": 3,
+                "parent_id": 1
             }
-        ]
+        ] 
     }
     ```

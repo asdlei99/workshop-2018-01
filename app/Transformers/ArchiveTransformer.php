@@ -35,6 +35,7 @@ class ArchiveTransformer extends TransformerAbstract
         return [
             'description' => $archive->description,
             'id' => $archive->id,
+            'parent_id' => $archive->parent_id,
         ];
     }
 }
