@@ -36,7 +36,7 @@ class UserController extends Controller
 
         if(! $oauth2token){
             $response = response()->json(
-                ReturnHelper::returnWithStatus(['errors'=>'token_id错误'],1002,'Unauthorized')
+                ReturnHelper::returnWithStatus('token_id错误',1002)
             );
             return $response;
         }
@@ -45,7 +45,7 @@ class UserController extends Controller
 
         if($oauth2token->access_token !== $access_token){
             $response = response()->json(
-                ReturnHelper::returnWithStatus(['errors'=>'token_id与token不符，请尝试重新登录'],1003,'Unauthorized')
+                ReturnHelper::returnWithStatus('token_id与token不符，请尝试重新登录',1003)
             );
             return $response;
         }
@@ -72,7 +72,6 @@ class UserController extends Controller
         $user->phone = $request->input('phone',null);
         $user->qq = $request->input('qq',null);
         $user->signature = $request->input('signature',null);
-//        $user->head_img =   //TODO  头像功能
         if($request->input('phone_access')){
             $user->phone_access = $request->input('phone_access');
         }
@@ -87,7 +86,7 @@ class UserController extends Controller
             $user->save();
         }catch (\Exception $e){
 //            return $e->getMessage();
-            return ReturnHelper::returnWithStatus(['errors'=>'注册失败'],1004,'修改用户信息失败');
+            return ReturnHelper::returnWithStatus('注册失败',1004);
         }
 
         return ReturnHelper::returnWithStatus(Fractal::item($user,new UserSelfTransformer()));
@@ -111,7 +110,7 @@ class UserController extends Controller
             $user->save();
         }catch (\Exception $e){
 //            return $e->getMessage();
-            return ReturnHelper::returnWithStatus(['errors'=>'修改失败'],1004,'修改用户信息失败');
+            return ReturnHelper::returnWithStatus('修改失败',1004);
         }
 
         return ReturnHelper::returnWithStatus(Fractal::item($user,new UserSelfTransformer()));
@@ -150,7 +149,7 @@ class UserController extends Controller
         try{
             $user->delete();
         }catch (\Exception $e){
-            return ReturnHelper::returnWithStatus(['errors'=>'注销失败'],1005,'注销失败');
+            return ReturnHelper::returnWithStatus('注销失败',1005);
         }
 
         return ReturnHelper::returnWithStatus();
