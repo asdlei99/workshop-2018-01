@@ -18,7 +18,7 @@ class CheckAuth
      * @param  \Closure  $next
      * @return mixed
      */
-    public function handle($request, Closure $next)
+    public function handle($request, Closure $next,Provider $provider, $user_group = null)
     {
         $oauth2token = OAuth2Token::find($request->input('token_id',0));
 
@@ -29,8 +29,15 @@ class CheckAuth
             return $response;
         }
         //todo 也许这里也可以检查是否过期
+        try{
+            $access_token = decrypt($request->input('access_token'));
+        }catch (\Exception $e){
+            $response = response()->json(
+                ReturnHelper::returnWithStatus('access_token错误，无法解析',1006)
+            );
+            return $response;
+        }
 
-        $access_token = decrypt($request->input('access_token'));
 
         if($oauth2token->access_token !== $access_token){
             $response = response()->json(
@@ -47,6 +54,16 @@ class CheckAuth
                 ReturnHelper::returnWithStatus('第一次登陆，请完善信息',1001)
             );
             return $response;
+        }
+
+        //查看是否为管理员等
+        if($user_group !== null){
+            if($user->user_group > $user_group){
+                $response = response()->json(
+                    ReturnHelper::returnWithStatus('权限不足',6000)
+                );
+                return $response;
+            }
         }
 
         session()->flash('user',$user);

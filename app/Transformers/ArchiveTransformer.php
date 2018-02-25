@@ -33,7 +33,7 @@ class ArchiveTransformer extends TransformerAbstract
     public function transform($archive)
     {
         return [
-            'description' => $archive->description,
+            'name' => $archive->name,
             'id' => $archive->id,
             'parent_id' => $archive->parent_id,
         ];

@@ -66,7 +66,7 @@ class PostController extends Controller
         if($request->input('description')){
             $post->description = $request->input('description');
         }else{
-            $post->description = $post->title;
+            $post->description = substr($request->input('description'),0,200);
         }
 
         $post_archive = new PostArchive();
@@ -112,7 +112,7 @@ class PostController extends Controller
         if($request->input('description')){
             $post->description = $request->input('description');
         }else{
-            $post->description = $post->title;
+            $post->description = substr($request->input('description'),0,200);
         }
 
         $post_archive = PostArchive::findByPostId($post->id);

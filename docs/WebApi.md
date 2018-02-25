@@ -40,3 +40,7 @@
     
 **注意，仅第一层评论有CommentPopularit**
 
+## todo list
+* 增加、删除类别
+* post的description应截取一小段
+* middle 判断用户用户组的middleware

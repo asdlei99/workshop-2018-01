@@ -77,11 +77,6 @@ Route::middleware('auth')->prefix('likes')->namespace('WebApi')->group(function 
 Route::post('/favorites/posts/{post}','WebApi\\FavoriteController@favoritePost')->middleware('auth');
 
 /**
- * 管理员
- */
-Route::post('/admin/message','WebApi\\AdminController@createSystemMessage')->middleware('auth');
-
-/**
  * 搜索
  */
 Route::namespace('WebApi')->group(function(){
@@ -89,4 +84,15 @@ Route::namespace('WebApi')->group(function(){
     Route::get('search/p','SearchController@searchPost');
 });
 
+/**
+ * 管理员
+ */
+//todo use middleware to judge if someone is administrator
+Route::namespace('Admin')->prefix('admin')->middleware('auth:2')->group(function(){
+//Route::namespace('Admin')->prefix('admin')->group(function(){
+    Route::post('messages','MessageController@createSystemMessage');
 
+    Route::post('archives','ArchiveController@create');
+    Route::PATCH('archives/{id}','ArchiveController@update');
+    Route::delete('archives/{id}','ArchiveController@destroy');
+});

@@ -57,9 +57,8 @@ class IndexController extends Controller
 
     public function logout()
     {
-
-        //todo
         Provider::logout();
+//        return redirect('https://account.eeyes.net/logout?redirect='.config('APP_URL'));
     }
 
 }

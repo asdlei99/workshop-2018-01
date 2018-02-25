@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class Post extends Model
 {
     use SoftDeletes,SearchTrait;
+
     protected $dates = ['deleted_at'];
 
     public function comments()

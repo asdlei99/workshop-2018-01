@@ -6,8 +6,10 @@
     "type": "project",
     "require": {
         "php": ">=7.0.0",
+        "barryvdh/laravel-cors": "^0.11.0",
         "cantjie/oauth2-laravel-eeyes": "dev-master",
         "cyvelnet/laravel5-fractal": "^2.2",
+        "doctrine/dbal": "^2.6",
         "fideloper/proxy": "~3.3",
         "ganlvtech/eeyes-common": "^0.1.1",
         "laravel/framework": "5.5.*",

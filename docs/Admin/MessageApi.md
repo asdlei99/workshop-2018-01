@@ -1,10 +1,10 @@
-# 管理
+# 系统通知
 * 发布系统通知
 
 ## 发布系统通知
 **(该接口尚未测试)**
 ```POST
-POST {{server}}/admin/message
+POST {{server}}/admin/messages
     
     token_id
     access_token

@@ -44,7 +44,7 @@ class CreateSystemMessageRequest extends FormRequest
     {
         exit(json_encode(ReturnHelper::returnWithStatus(
             $validator->errors()->toArray(),
-            6002
+            6001
         )));
     }
 }

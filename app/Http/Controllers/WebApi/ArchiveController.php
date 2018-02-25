@@ -15,4 +15,5 @@ class ArchiveController extends Controller
     {
         return ReturnHelper::returnWithStatus(Fractal::collection(Archive::all(),new ArchiveTransformer()) );
     }
+
 }
