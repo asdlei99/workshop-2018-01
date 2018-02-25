@@ -18,7 +18,7 @@ class CheckAuth
      * @param  \Closure  $next
      * @return mixed
      */
-    public function handle($request, Closure $next,Provider $provider, $user_group = null)
+    public function handle($request, Closure $next, $user_group = null)
     {
         $oauth2token = OAuth2Token::find($request->input('token_id',0));
 

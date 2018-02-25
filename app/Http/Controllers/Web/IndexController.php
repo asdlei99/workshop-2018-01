@@ -17,7 +17,7 @@ class IndexController extends Controller
     public function login(Request $request)
     {
         $provider = new Provider([
-                'state' => $request->input('state',url()->current())
+                'state' => $request->input('state',url()->previous())
             ]);
 
         if($request->input('code')){
