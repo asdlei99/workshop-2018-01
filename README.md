@@ -1,6 +1,6 @@
 # e曈网创意工坊
 
-[WebAPI](http://apizza.cc/console/project/c38ae5c7dc331862cb53dab487521c65/dev)
+接口文档在docs文件夹下
 
 安装好后要将
 \League\Fractal\Serializer\ArraySerializer.php中的collection方法改写
