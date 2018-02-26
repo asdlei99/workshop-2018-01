@@ -7,6 +7,7 @@ use App\Http\ReturnHelper;
 use App\OAuth2Token;
 use Cantjie\Oauth2\Provider;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cookie;
 
 class IndexController extends Controller
 {
@@ -28,11 +29,33 @@ class IndexController extends Controller
                 $token_id = $token->createOrSave($access_token);
 
                 if($token_id){
-                    return ReturnHelper::returnWithStatus([
-                        'access_token' => encrypt($access_token['access_token']),
-                        'token_id' => $token_id,
-                        'state' => $request->input('state',null),
-                        ]);
+                    /**
+                     * 将token_id和access_token加入cookie
+                     */
+                    Cookie::queue(Cookie::make('token_id', $token_id, 60));
+                    Cookie::queue(Cookie::make('access_token',encrypt($access_token['access_token'],60)));
+                    return redirect($request->input('state',config('app.url')));
+                    /**
+                     *将token_id和access_token添加到url中
+                     */
+//                    $query = [
+//                        'access_token' => encrypt($access_token['access_token']),
+//                        'token_id' => $token_id,
+//                    ];
+//                    $query = http_build_query($query);
+//                    return redirect(
+//                        $request->input('state',config('app.url'))
+//                        .'?'
+//                        .$query
+//                    );
+                    /**
+                     * 原始
+                     */
+//                    return ReturnHelper::returnWithStatus([
+//                        'access_token' => encrypt($access_token['access_token']),
+//                        'token_id' => $token_id,
+//                        'state' => $request->input('state',null),
+//                        ]);
                 }else{
                     return ReturnHelper::returnWithStatus('认证失败',403);
                 }
@@ -47,7 +70,13 @@ class IndexController extends Controller
 
     public function index(Request $request)
     {
+        echo '<a href="/login">登录</a>';
+        echo '</br>';
+        echo '<a href="/logout">登出</a>';
+        echo '</br>';
 
+        var_dump($_COOKIE) ;
+        dd('这是e曈创意工坊首页');
 //        $user = (new Provider())->getResourceOwner();
 //        if(($pre_page = $user->getPrePage())){
 //            return redirect($pre_page);
@@ -57,8 +86,10 @@ class IndexController extends Controller
 
     public function logout()
     {
-        Provider::logout();
-//        return redirect('https://account.eeyes.net/logout?redirect='.config('APP_URL'));
+        Cookie::queue(Cookie::forget('access_token'));
+        Cookie::queue(Cookie::forget('token_id'));
+
+        return redirect(config('app.url'));
     }
 
 }

@@ -8,6 +8,7 @@ use Cantjie\Oauth2\Provider;
 use Closure;
 use App\OAuth2Token;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cookie;
 
 class CheckAuth
 {
@@ -20,6 +21,9 @@ class CheckAuth
      */
     public function handle($request, Closure $next, $user_group = null)
     {
+//        $token_id = Cookie::get('token_id');
+//        $access_token = Cookie::get('access_token');
+//        dd($token_id);
         $oauth2token = OAuth2Token::find($request->input('token_id',0));
 
         if(! $oauth2token){
