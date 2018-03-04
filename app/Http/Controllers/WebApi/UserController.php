@@ -10,11 +10,9 @@ use App\Http\Requests\uploadAvatarRequest;
 use App\Http\ReturnHelper;
 use App\Post;
 use App\PostLikeMessageControl;
-use App\Providers\EventServiceProvider;
 use App\SystemMessageControl;
 use App\SystemMessageText;
 use App\Transformers\MessageControlTransformer;
-use App\Transformers\PostSimpleDataTransformer;
 use App\Transformers\PostTransformer;
 use App\Transformers\UserOtherTransformer;
 use App\Transformers\UserSelfTransformer;
@@ -118,7 +116,6 @@ class UserController extends Controller
 
     public function uploadAvatar(uploadAvatarRequest $request)
     {
-        //todo 上传图片这里在不同操作系统可能会出现问题
         $user = session('user');
 
         $path = $request->head_img->store('avatars');
@@ -135,7 +132,7 @@ class UserController extends Controller
         try{
             $user->save();
         }catch (\Exception $e){
-            return $e->getMessage();
+            return ReturnHelper::returnWithStatus('头像上传失败',1007);
         }
 
         return ReturnHelper::returnWithStatus(Fractal::item($user,new UserSelfTransformer()));
@@ -177,6 +174,11 @@ class UserController extends Controller
         $user = session('user');
         $paginator = $user->posts()->orderBy('id','desc')->simplePaginate($cnt);
         $published = $paginator->getCollection();
+
+        foreach($published as $key => $post){
+            $post->index = $key;
+        }
+
         return ReturnHelper::returnWithStatus(Fractal::collection($published,new PostTransformer()),200,$paginator);
     }
 
@@ -278,10 +280,10 @@ class UserController extends Controller
         $user = session('user');
 
         //找到在text表中发布但没添加到control表中的系统消息
-        $message_texts = SystemMessageText::UserGroup($user->user_group)->get()->toArray();
-        $message_text_ids = array_map(function($message_text){return $message_text->id;},$message_texts);
+        $message_texts = SystemMessageText::UserGroupMoreThan($user->user_group)->get()->toArray();
+        $message_text_ids = array_map(function($message_text){return $message_text['id'];},$message_texts);
         $message_controls = SystemMessageControl::Ids($message_text_ids)->get()->toArray();
-        $message_control_message_ids = array_map(function($message_control){return $message_control->message_id;},$message_controls);
+        $message_control_message_ids = array_map(function($message_control){return $message_control['message_id'];},$message_controls);
 
         //如果有上述消息，就创建新的SystemMessageControl
         $not_added = array_diff($message_text_ids,$message_control_message_ids);
@@ -297,22 +299,17 @@ class UserController extends Controller
         $messages = [];
         $i = 0;
         foreach ($message_controls as $message_control){
-            $message_text = SystemMessageText::find($message_control->message_id);
+            $message_text = SystemMessageText::find($message_control['message_id']);
             $messages[$i] = [
-                'id' => $message_control->id,
-                'title' => $message_text->title,
-                'body' => $message_text->body,
-                'created_at' => Carbon::parse($message_text->created_at)->format("Y-m-d h:i:s"),
-                'has_read' => $message_control->has_read,
+                'id' => $message_control['id'],
+                'title' => $message_text['title'],
+                'body' => $message_text['body'],
+                'created_at' => Carbon::parse($message_text['created_at'])->format("Y-m-d h:i:s"),
+                'has_read' => $message_control['has_read'],
             ];
         }
 
         return ReturnHelper::returnWithStatus($messages);
-
-
-
-
-
     }
     
     //个人中心——将系统信息标为已读
@@ -375,7 +372,7 @@ class UserController extends Controller
         $posts = $paginator->getCollection();
 
         return ReturnHelper::returnWithStatus(
-            Fractal::collection($posts, new PostSimpleDataTransformer()),
+            Fractal::collection($posts, new PostTransformer()),
             200,
             $paginator
         );

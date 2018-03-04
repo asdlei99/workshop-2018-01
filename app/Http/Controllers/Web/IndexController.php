@@ -32,22 +32,22 @@ class IndexController extends Controller
                     /**
                      * 将token_id和access_token加入cookie
                      */
-                    Cookie::queue(Cookie::make('token_id', $token_id, 60));
-                    Cookie::queue(Cookie::make('access_token',encrypt($access_token['access_token'],60)));
-                    return redirect($request->input('state',config('app.url')));
+//                    Cookie::queue(Cookie::make('token_id', $token_id, 60));
+//                    Cookie::queue(Cookie::make('access_token',encrypt($access_token['access_token'],60)));
+//                    return redirect($request->input('state',config('app.url')));
                     /**
                      *将token_id和access_token添加到url中
                      */
-//                    $query = [
-//                        'access_token' => encrypt($access_token['access_token']),
-//                        'token_id' => $token_id,
-//                    ];
-//                    $query = http_build_query($query);
-//                    return redirect(
-//                        $request->input('state',config('app.url'))
-//                        .'?'
-//                        .$query
-//                    );
+                    $query = [
+                        'access_token' => encrypt($access_token['access_token']),
+                        'token_id' => $token_id,
+                    ];
+                    $query = http_build_query($query);
+                    return redirect(
+                        $request->input('state',config('app.url'))
+                        .'?'
+                        .$query
+                    );
                     /**
                      * 原始
                      */

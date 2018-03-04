@@ -12,4 +12,9 @@ class SystemMessageText extends Model
     {
         return $query->where('user_group',$user_group);
     }
+
+    public function scopeUserGroupMoreThan($query, $user_group = 3)
+    {
+        return $query->where('user_group','>=',$user_group);
+    }
 }

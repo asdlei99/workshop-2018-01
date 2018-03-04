@@ -34,7 +34,7 @@ class PostSimpleDataTransformer extends TransformerAbstract
      */
     public function transform(Post $post)
     {
-        return [
+        $data = [
             'id' => $post->id,
             'title' => $post->title,
             'description' => $post->description,
@@ -43,6 +43,12 @@ class PostSimpleDataTransformer extends TransformerAbstract
 //            'created_at' => Carbon::parse($post->created_at)->format("Y-m-d h:i:s") ,
             'updated_at' => Carbon::parse($post->updated_at)->format("Y-m-d h:i:s") ,
         ];
+
+        if($post->index !== null){
+            $data['index'] = $post->index;
+        }
+
+        return $data;
     }
 
     public function includeUser(Post $post)

@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Requests\CreateSystemMessageRequest;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use App\SystemMessageText;
+use App\Http\ReturnHelper;
 
 class MessageController extends Controller
 {
@@ -18,6 +20,7 @@ class MessageController extends Controller
         try{
             $system_message->save();
         }catch (\Exception $e){
+//            return $e->getMessage();
             return ReturnHelper::returnWithStatus('通知发布失败',6002);
         }
 
