@@ -14,6 +14,7 @@ Route::prefix('users')->namespace('WebApi')->group(function(){
     Route::post('/info','UserController@getSelfInfo')->middleware('auth');
     Route::get('/{username}/info','UserController@getInfo');
 
+    Route::post('/{username}/publish','UserController@getOthersPublished');
 });
 
 /**
@@ -30,7 +31,6 @@ Route::prefix('users')->middleware('auth')->namespace('WebApi')->group(function 
     Route::post('/messages/likes/comments','UserController@getCommentLikeMessage');
     Route::post('/messages/likes/posts','UserController@getPostLikeMessage');
     Route::patch('/messages/likes/{id}','UserController@readLikeMessage');
-
 
     Route::post('/messages/system','UserController@getSystemMessage');
     Route::patch('/messages/system/{id}','UserController@readSystemMessage');

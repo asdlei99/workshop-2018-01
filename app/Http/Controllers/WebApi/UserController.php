@@ -182,6 +182,27 @@ class UserController extends Controller
         return ReturnHelper::returnWithStatus(Fractal::collection($published,new PostTransformer()),200,$paginator);
     }
 
+    //个人中心——获得他发布的文章
+    public function getOthersPublished(Request $request, $username)
+    {
+        $cnt = $request->query('cnt',15);
+
+        $user = User::getUserByUsername($username);
+        if($user === null){
+            return ReturnHelper::returnWithStatus('未找到指定用户',1008);
+        }
+
+        $paginator = $user->posts()->orderBy('id','desc')->simplePaginate($cnt);
+        $published = $paginator->getCollection();
+
+        foreach ($published as $key => $post){
+            $post->index = $key;
+        }
+
+        return ReturnHelper::returnWithStatus(Fractal::collection($published,new PostTransformer()),200,$paginator);
+
+    }
+
     //个人中心——获得评论自己的消息
     public function getCommentMessage(Request $request)
     {
@@ -377,5 +398,6 @@ class UserController extends Controller
             $paginator
         );
     }
+
 }
 

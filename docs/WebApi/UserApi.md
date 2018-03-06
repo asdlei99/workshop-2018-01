@@ -17,6 +17,7 @@
 * 个人中心-将收到的赞标为已读
 * 个人中心-系统通知
 * 个人中心-将系统通知标记为已读
+* 个人中心-他人查看-他的发布
 
 ## 登录
 注意，这个可能不算是API，因为它会重定向到CAS登录界面。初次登陆会请求授权。
@@ -735,3 +736,101 @@ POST {{server}}/users/messages/system
 ```html
 PATCH {{server}}/users/messages/system/{id}
 ```
+
+## 个人中心-他人查看-他的发布
+```html
+POST {{server}}/users/{username}/publish
+```
+
+* 成功后返回
+    ```json
+    {
+        "code": 200,
+        "data": [
+            {
+                "id": 12,
+                "title": "第8篇文章标题",
+                "description": "第8文章描述",
+                "body": "第8篇文章正文",
+                "anonymous": null,
+                "views": null,
+                "created_at": "2018-03-04 07:18:49",
+                "updated_at": "2018-03-04 07:18:49",
+                "index": 0,
+                "archive": [
+                    {
+                        "name": "干货",
+                        "id": 1,
+                        "parent_id": 0
+                    },
+                    {
+                        "name": "黑科技",
+                        "id": 2,
+                        "parent_id": 1
+                    }
+                ],
+                "user": {
+                    "id": 6,
+                    "username": "cantjie",
+                    "nickname": "Cantjie",
+                    "head_img": null,
+                    "signature": "个性签名",
+                    "email": "cantjie1@163.com",
+                    "qq": null
+                },
+                "popularity": {
+                    "like_count": 0,
+                    "comment_count": 0,
+                    "favorite_count": 0,
+                    "view_count": 10
+                }
+            },
+            {
+                "id": 11,
+                "title": "第8篇文章标题",
+                "description": "第8文章描述",
+                "body": "第8篇文章正文",
+                "anonymous": null,
+                "views": null,
+                "created_at": "2018-03-04 07:16:18",
+                "updated_at": "2018-03-04 07:16:18",
+                "index": 1,
+                "archive": [
+                    {
+                        "name": "干货",
+                        "id": 1,
+                        "parent_id": 0
+                    },
+                    {
+                        "name": "黑科技",
+                        "id": 2,
+                        "parent_id": 1
+                    }
+                ],
+                "user": {
+                    "id": 6,
+                    "username": "cantjie",
+                    "nickname": "Cantjie",
+                    "head_img": null,
+                    "signature": "个性签名",
+                    "email": "cantjie1@163.com",
+                    "qq": null
+                },
+                "popularity": {
+                    "like_count": 0,
+                    "comment_count": 0,
+                    "favorite_count": 0,
+                    "view_count": 3
+                }
+            }
+        ],
+        "current_page": 1,
+        "first_page_url": "http://39.106.56.194/api/users/cantjie/publish?page=1&cnt=15",
+        "from": 1,
+        "next_page_url": null,
+        "path": "http://39.106.56.194/api/users/cantjie/publish",
+        "per_page": 15,
+        "prev_page_url": null,
+        "to": 2
+    }
+    ```
