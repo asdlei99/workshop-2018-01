@@ -46,6 +46,8 @@ Route::prefix('posts')->namespace('WebApi')->group(function() {
     Route::patch('/{post}','PostController@update')->middleware('auth');
     Route::delete('/{post}','PostController@destroy')->middleware('auth');
     Route::get('/{post}/comments','CommentController@getPostComments');
+
+    Route::post('/{post}/cover','PostController@uploadCover');
 });
 
 /**

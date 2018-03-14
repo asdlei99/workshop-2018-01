@@ -5,6 +5,7 @@ namespace App\Http\Controllers\WebApi;
 use App\Archive;
 use App\Http\Requests\StorePostRequest;
 use App\Http\Requests\UpdatePostRequest;
+use App\Http\Requests\uploadCoverRequest;
 use App\Http\ReturnHelper;
 use App\Post;
 use App\PostArchive;
@@ -173,6 +174,39 @@ class PostController extends Controller
             200,
             $paginator
         );
+    }
+
+    //上传封面图
+    public function uploadCover(uploadCoverRequest $request,$id)
+    {
+        $user = session('user');
+
+        $post = Post::find($id);
+        if($post === null){
+            return ReturnHelper::returnWithStatus('未找到指定文章',2003);
+        }
+        if($user->id !== $post->user_id){
+            return ReturnHelper::returnWithStatus('您可能并非文章作者，权限不足',2004);
+        }
+
+        $path = $request->cover_img->store('covers');
+        $path = '/storage/'.$path;
+
+        $old_path = $post->cover_img;
+        if($old_path !== null){
+            $old_path = substr($old_path,9);
+            Store::delete($old_path);
+        }
+
+        $post->cover_img = $path;
+
+        try{
+            $post->save();
+        }catch (\Exception $e){
+            return ReturnHelper::returnWithStatus('封面图上传失败',2006);
+        }
+
+        return ReturnHelper::returnWithStatus(Fractal::item($post,new PostTransformer()));
     }
 
 }

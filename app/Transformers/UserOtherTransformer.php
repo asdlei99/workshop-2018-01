@@ -15,7 +15,7 @@ class UserOtherTransformer extends TransformerAbstract
      *
      * @var array
      */
-    protected $availableIncludes = ['post'];
+    protected $availableIncludes = ['posts'];
 
     /**
      * List of resources to automatically include
@@ -56,8 +56,8 @@ class UserOtherTransformer extends TransformerAbstract
      * @param User $user
      * @return Collection
      */
-    public function includePosts(User $user)
+    public function includePosts(\App\User $user)
     {
-        return $this->collection($user->posts(),new PostTransformer());
+        return $this->collection($user->getPosts(3),new PostTransformer());
     }
 }

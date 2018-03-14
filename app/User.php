@@ -28,9 +28,15 @@ class User extends Authenticatable
         'password', 'remember_token',
     ];
 
-    public function getPosts()
+    public function getPosts($cnt = null)
     {
-        return $this->hasMany(Post::class,'user_id','id')->getResults();
+        $posts = $this->posts()->orderBy('id','desc');
+
+        if($cnt === null){
+            return $posts->getResults();
+        }
+
+        return $posts->limit($cnt)->getResults();
     }
 
     public function posts()

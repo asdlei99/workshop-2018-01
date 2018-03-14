@@ -19,9 +19,8 @@ class SearchController extends Controller
         $word = $request->query('wd');
         $paginator = User::search($word, ['username','nickname'])->orderByDate()->simplePaginate($cnt);
         $users = $paginator->getCollection();
-
         return ReturnHelper::returnWithStatus(
-            Fractal::collection($users, new UserOtherTransformer()),
+            Fractal::includes('posts')->collection($users, new UserOtherTransformer()),
             200,
             $paginator
         );
